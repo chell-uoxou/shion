@@ -50,6 +50,10 @@
  --light: #F4EFFA;
 }
 
+body {
+  background: var(--light);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
