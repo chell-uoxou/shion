@@ -1,7 +1,10 @@
 "use client";
 import { CirclePlus, Search } from "lucide-react";
+
+import MemoryCard from "@/features/memoryTimeline/components/MemoryCard";
+
 export default function Page() {
-  const hasMemory = false;
+  const hasMemory = true;
 
   return (
     <>
@@ -21,7 +24,7 @@ export default function Page() {
       </div>
       <div className="w-full h-full">
         {hasMemory ? (
-          <div>メモリー一覧</div>
+          <MemoryCard />
         ) : (
           <div className="h-full flex items-center justify-center ">
             まだ出来事がありません
