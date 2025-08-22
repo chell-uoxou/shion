@@ -1,8 +1,8 @@
 "use client";
-
-import { useState } from "react";
-
 // ↑おまじない
+
+import { RedTitle } from "@/features/reactPractice/components/RedTitle";
+import { useState } from "react";
 
 export default function Page() {
   const [count, setCount] = useState(0);
@@ -21,7 +21,11 @@ export default function Page() {
   return (
     <div className="p-5">
       <div className="w-64 flex flex-col gap-2">
-        <h1 className="bg-red-400 text-center">soraのReact練習°˖✧◝(⁰▿⁰)◜✧˖°</h1>
+        <RedTitle text="soraのReact練習°˖✧◝(⁰▿⁰)◜✧˖°" />
+        <RedTitle text="こんにちは" />
+        <RedTitle text="React教室です" />
+        <RedTitle text="よろしくお願いします" />
+
         <button
           className="bg-black text-white px-2 py-1 rounded-lg"
           onClick={handleClick}
