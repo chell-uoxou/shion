@@ -21,3 +21,5 @@ remove:
 
 setup:
 	docker compose build
+	cd backend && go mod tidy
+	cd frontend && npm install
