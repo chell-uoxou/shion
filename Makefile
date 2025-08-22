@@ -9,3 +9,12 @@ migrate-up:
 migrate-reset:
 	docker compose run --rm migrate -path=/migrations -database "$(DATABASE_URL)?sslmode=disable" drop -f
 	docker compose run --rm migrate -path=/migrations -database "$(DATABASE_URL)?sslmode=disable" up
+
+start:
+	docker compose up -d
+
+stop:
+	docker compose stop
+
+down:
+	docker compose down
