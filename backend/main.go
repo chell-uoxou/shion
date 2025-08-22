@@ -12,8 +12,8 @@ const SERVER_PORT = ":8080"
 var allowedOrigin = os.Getenv("ALLOWED_FRONTEND_ORIGIN")
 
 // CORS ミドルウェア
-func withCORS(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func withCORS(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if allowedOrigin != "" {
 			w.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
 		}
@@ -26,17 +26,14 @@ func withCORS(next http.HandlerFunc) http.HandlerFunc {
 			w.WriteHeader(http.StatusOK)
 			return
 		}
-
 		next.ServeHTTP(w, r)
-	}
+	})
 }
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("health 叩かれた！")
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-
 	json.NewEncoder(w).Encode(map[string]string{
 		"status":  "ok",
 		"message": "うごいてるよ",
@@ -52,12 +49,14 @@ func main() {
 		fmt.Println("info: ALLOWED_FRONTEND_ORIGIN is set to", allowedOrigin)
 	}
 
-	http.HandleFunc("/health", withCORS(healthHandler))
+	mux := http.NewServeMux()
+	mux.HandleFunc("/health", healthHandler)
+
+	// mux 全体に CORS ミドルウェアを適用
+	handler := withCORS(mux)
 
 	fmt.Printf("Listening on %s\n", SERVER_PORT)
-
-	if err := http.ListenAndServe(SERVER_PORT, nil); err != nil {
+	if err := http.ListenAndServe(SERVER_PORT, handler); err != nil {
 		fmt.Println("Server failed:", err)
 	}
-
 }
