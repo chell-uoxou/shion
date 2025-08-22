@@ -16,5 +16,8 @@ start:
 stop:
 	docker compose stop
 
-down:
+remove:
 	docker compose down
+
+setup:
+	docker compose build
