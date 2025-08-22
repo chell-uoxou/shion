@@ -3,10 +3,10 @@ import { PropsWithChildren } from "react";
 
 export default function AppLayout({ children }: PropsWithChildren) {
   return (
-    <div className="h-svh flex flex-col gap-0">
+    <div className="bg-[#F4EFFA] h-svh flex flex-col gap-0">
       <div className="flex items-center justify-center h-16">shion logo</div>
       <div className="flex-1">{children}</div>
-      <footer className="flex justify-between bg-neutral-200 h-14 items-center px-10">
+      <footer className="flex justify-between h-14 items-center px-10 border-t border-[#7C56B5]">
         <UsersRound />
         <House />
         <UserRound />
