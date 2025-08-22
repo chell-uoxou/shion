@@ -5,6 +5,10 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+
+	"database/sql"
+
+	_ "github.com/lib/pq"
 )
 
 const SERVER_PORT = ":8080"
@@ -41,12 +45,30 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	fmt.Println("Launching shion backend...")
+	fmt.Println("info: Launching shion backend...")
 
 	if allowedOrigin == "" {
 		fmt.Println("warn: ALLOWED_FRONTEND_ORIGIN is not set")
 	} else {
 		fmt.Println("info: ALLOWED_FRONTEND_ORIGIN is set to", allowedOrigin)
+	}
+
+	dsn := os.Getenv("DATABASE_URL")
+
+	if dsn == "" {
+		fmt.Println("error: DATABASE_URL is not set")
+		return
+	} else {
+		fmt.Println("info: DATABASE_URL is set to", dsn)
+		db, err := sql.Open("postgres", dsn)
+
+		if err != nil {
+			fmt.Println("error: Database connection failed:", err)
+			return
+		} else {
+			fmt.Println("info: Database connection established.")
+		}
+		defer db.Close()
 	}
 
 	mux := http.NewServeMux()
@@ -55,8 +77,8 @@ func main() {
 	// mux 全体に CORS ミドルウェアを適用
 	handler := withCORS(mux)
 
-	fmt.Printf("Listening on %s\n", SERVER_PORT)
+	fmt.Printf("info: Listening on %s\n", SERVER_PORT)
 	if err := http.ListenAndServe(SERVER_PORT, handler); err != nil {
-		fmt.Println("Server failed:", err)
+		fmt.Println("error: Server failed:", err)
 	}
 }
