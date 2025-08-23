@@ -3,8 +3,6 @@ import React from "react";
 import {
   Edit3,
   Trash2,
-  Settings,
-  Info,
   ChevronRight,
   UsersRound,
   KeyRound,
@@ -52,10 +50,22 @@ const UserProfile: React.FC<UserProfileProps> = ({ src, name, size = 100 }) => {
 
 export default function Page() {
   const buttons = [
-    { label: "話し相手一覧", leftIcon: <UsersRound size={20} /> },
-    { label: "プロフィール編集", leftIcon: <Edit3 size={20} /> },
-    { label: "パスワード変更", leftIcon: <KeyRound size={20} /> },
-    { label: "アカウント削除", leftIcon: <Trash2 size={20} /> },
+    {
+      label: "話し相手一覧",
+      leftIcon: <UsersRound size={20} className="color-brand-violet-2" />,
+    },
+    {
+      label: "プロフィール編集",
+      leftIcon: <Edit3 size={20} className="color-brand-violet-2" />,
+    },
+    {
+      label: "パスワード変更",
+      leftIcon: <KeyRound size={20} className="color-brand-violet-2" />,
+    },
+    {
+      label: "アカウント削除",
+      leftIcon: <Trash2 size={20} className="color-brand-violet-2" />,
+    },
   ];
 
   return (
@@ -76,18 +86,12 @@ export default function Page() {
           >
             {/* 左アイコン + ラベル */}
             <div className="flex items-center space-x-2">
-              {React.cloneElement(btn.leftIcon, {
-                color: "var(--brand-violet-2)",
-                size: 20,
-              })}
+              {btn.leftIcon}
               <span>{btn.label}</span>
             </div>
 
             {/* 右の矢印 */}
-            {React.createElement(ChevronRight, {
-              color: "var(--brand-violet-2)",
-              size: 20,
-            })}
+            <ChevronRight className="color-brand-violet-2" size={20} />
           </button>
         ))}
       </div>
