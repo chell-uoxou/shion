@@ -5,6 +5,7 @@ import { PropsWithChildren } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -51,7 +52,15 @@ function FooterNav() {
 export default function AppLayout({ children }: PropsWithChildren) {
   return (
     <div className="bg-[#F4EFFA] h-svh flex flex-col gap-0">
-      <div className="flex items-center justify-center h-16">shion logo</div>
+      <div className="flex items-center justify-center h-16">
+        <Image
+          className=""
+          src="logo.svg"
+          alt="ロゴ画像"
+          width={80}
+          height={80}
+        />
+      </div>
       <div className="flex-1">
         <QueryClientProvider client={queryClient}>
           {children}
