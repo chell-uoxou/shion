@@ -1,47 +1,24 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
+	"shion/handler/auth"
+	"shion/handler/resource"
+	"shion/handler/system"
+	"shion/middleware"
+	"shion/repository/postgres"
+
+	_ "github.com/lib/pq"
 )
 
 const SERVER_PORT = ":8080"
 
 var allowedOrigin = os.Getenv("ALLOWED_FRONTEND_ORIGIN")
 
-// CORS ミドルウェア
-func withCORS(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if allowedOrigin != "" {
-			w.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
-		}
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-		w.Header().Set("Vary", "Origin")
-
-		// プリフライトリクエストはここで終了
-		if r.Method == http.MethodOptions {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-		next.ServeHTTP(w, r)
-	})
-}
-
-func healthHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("health 叩かれた！")
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{
-		"status":  "ok",
-		"message": "うごいてるよ",
-	})
-}
-
 func main() {
-	fmt.Println("Launching shion backend...")
+	fmt.Println("info: Launching shion backend...")
 
 	if allowedOrigin == "" {
 		fmt.Println("warn: ALLOWED_FRONTEND_ORIGIN is not set")
@@ -49,14 +26,56 @@ func main() {
 		fmt.Println("info: ALLOWED_FRONTEND_ORIGIN is set to", allowedOrigin)
 	}
 
+	err := postgres.InitDB()
+	if err != nil {
+		fmt.Println("error: Database connection failed:", err)
+		return
+	}
+
+	defer postgres.DB.Close()
+
 	mux := http.NewServeMux()
-	mux.HandleFunc("/health", healthHandler)
+
+	// DBを操作するrepositoryを初期化
+	userRepo := postgres.NewUserRepository(postgres.DB)
+	memoryRepo := postgres.NewMemoryRepository(postgres.DB)
+
+	// // repo必要なルーターを初期化
+	// practiceUserRouter := practice.NewPracticeUserRouter(userRepo)
+	// authCallbackRouter := auth.NewAuthCallbackRouter(userRepo)
+	// meRouter := auth.NewMeRouter(userRepo)
+
+	// // repo必要なハンドラを登録
+	// mux.HandleFunc("/callback", authCallbackRouter.AuthCallbackHandler)
+	// mux.HandleFunc("/practice/users", practiceUserRouter.PracticeUsersHandler)
+
+	// // 認証が必要なハンドラを登録
+	// mux.Handle("/me", middleware.RequireAuth(http.HandlerFunc(meRouter.MeHandler)))
+
+	// // repo不要なハンドラを登録
+	// mux.HandleFunc("/login", auth.LoginHandler)
+	// mux.HandleFunc("/health", system.HealthHandler)
+
+	// system
+	mux.HandleFunc("/health", system.HealthHandler)
+
+	// auth
+	authRouter := auth.NewRouter(userRepo)
+	authRouter.Register(mux)
+
+	// friends
+	// friendRouter := friend.NewRouter(friendRepo)
+	// friendRouter.Register(mux)
+
+	// memories
+	memoryRouter := resource.NewMemoryRouter(memoryRepo, userRepo)
+	memoryRouter.Register(mux)
 
 	// mux 全体に CORS ミドルウェアを適用
-	handler := withCORS(mux)
+	handler := middleware.WithCORS(mux, allowedOrigin)
 
-	fmt.Printf("Listening on %s\n", SERVER_PORT)
+	fmt.Printf("info: Listening on %s\n", SERVER_PORT)
 	if err := http.ListenAndServe(SERVER_PORT, handler); err != nil {
-		fmt.Println("Server failed:", err)
+		fmt.Println("error: Server failed:", err)
 	}
 }

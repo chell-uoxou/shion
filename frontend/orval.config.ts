@@ -25,6 +25,12 @@ const config = defineConfig({
       prettier: true,
       tsconfig: "./tsconfig.json",
       baseUrl: apiBaseUrl,
+      override: {
+        mutator: {
+          path: "./src/lib/custom-instance.ts",
+          name: "customInstance",
+        },
+      },
     },
   },
 });
