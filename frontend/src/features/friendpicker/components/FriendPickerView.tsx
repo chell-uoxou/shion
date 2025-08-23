@@ -11,26 +11,19 @@ import { useState } from "react";
 import { Check, X } from "lucide-react";
 import UserRow from "@/features/FriendListitem/page";
 import { SearchForm } from "@/features/memoryTimeline/components/SearchForm";
-
-// -------------------
-// 型定義
-// -------------------
-export type User = {
-  id: string;
-  name: string;
-};
+import { Friend } from "@/generated/api/model";
 
 type UserSelectDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  users: User[];
-  onConfirm: (selected: User[]) => void;
+  friends: Friend[];
+  onConfirm: (selected: Friend[]) => void;
 };
 
 type UserDetailDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  user: User | null;
+  friend: Friend | null;
 };
 
 // -------------------
@@ -39,22 +32,9 @@ type UserDetailDialogProps = {
 export function UserSelectDialog({
   open,
   onOpenChange,
-  users,
+  friends,
   onConfirm,
 }: UserSelectDialogProps) {
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [query, setQuery] = useState("");
-
-  const toggleSelect = (id: string) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
-  };
-
-  const filteredUsers = users.filter((u) =>
-    u.name.toLowerCase().includes(query.toLowerCase())
-  );
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       {/* 背景だけ暗くする */}
@@ -72,7 +52,7 @@ export function UserSelectDialog({
 
         {/* ユーザーリスト */}
         <div className="max-h-[300px] overflow-y-auto space-y-2">
-          {users.map((user) => (
+          {friends.map((user) => (
             <div
               key={user.id}
               className="cursor-pointer"
@@ -82,7 +62,7 @@ export function UserSelectDialog({
                 onOpenChange(false);
               }}
             >
-              <UserRow src="/user-icon.svg" name={user.name} />
+              <UserRow src="/user-icon.svg" name={user.display_name || ""} />
             </div>
           ))}
         </div>
@@ -108,11 +88,11 @@ export function UserSelectDialog({
 export function UserDetailDialog({
   open,
   onOpenChange,
-  user,
+  friend,
 }: UserDetailDialogProps) {
   const [text, setText] = useState(""); // ← ここで state を作る
 
-  if (!user) return null;
+  if (!friend) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -120,7 +100,7 @@ export function UserDetailDialog({
       <DialogContent className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-w-sm bg-[var(--brand-violet-1)] h-[500px] p-4">
         <DialogHeader>
           <DialogTitle>
-            <UserRow src="/user-icon.svg" name={user.name} />
+            <UserRow src="/user-icon.svg" name={friend.display_name || ""} />
           </DialogTitle>
         </DialogHeader>
 

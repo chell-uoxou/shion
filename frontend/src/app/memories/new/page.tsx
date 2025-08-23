@@ -7,29 +7,26 @@ import { Button } from "@/components/ui/button";
 import { Check, UserRoundPlus, Plus, MapPlus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  User,
   UserDetailDialog,
   UserSelectDialog,
 } from "@/features/friendpicker/components/FriendPickerView";
+import { useGetFriends } from "@/generated/api/default/default";
+import { Friend } from "@/generated/api/model";
 
 export default function Page() {
   const [title, setTitle] = useState("");
   const [details, setDetails] = useState("");
   const [doneInput, setDoneInput] = useState(false);
   const [doneTextarea, setDoneTextarea] = useState(false);
-  const [open, setOpen] = useState(false);
   const [selectOpen, setSelectOpen] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
+
+  const { data: friendsData } = useGetFriends();
+  const friends = friendsData?.data || [];
 
   const today = new Date();
 
-  // ダミーユーザー
-  const users = [
-    { id: "1", name: "ユーザー1" },
-    { id: "2", name: "ユーザー2" },
-    { id: "3", name: "ユーザー3" },
-  ];
   const handleInputComplete = () => {
     if (title.trim() !== "") setDoneInput(true);
   };
@@ -154,10 +151,10 @@ export default function Page() {
             <UserSelectDialog
               open={selectOpen}
               onOpenChange={setSelectOpen}
-              users={users}
+              friends={friends}
               onConfirm={(selected) => {
                 if (selected.length > 0) {
-                  setSelectedUser(selected[0]);
+                  setSelectedFriend(selected[0]);
                   setDetailOpen(true);
                 }
                 setSelectOpen(false);
@@ -172,7 +169,7 @@ export default function Page() {
                 setDetailOpen(isOpen); // 詳細ダイアログの開閉
                 if (!isOpen) setSelectOpen(true); // 閉じたら選択ダイアログを再表示
               }}
-              user={selectedUser}
+              friend={selectedFriend}
             />
           </div>
           <p className="text-[var(--brand-violet-3)]">話し相手を追加</p>
