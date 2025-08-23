@@ -3,16 +3,29 @@ import { CirclePlus } from "lucide-react";
 
 import MemoryCard from "@/features/memoryTimeline/components/MemoryCard";
 import { SearchForm } from "@/features/memoryTimeline/components/SearchForm";
+import { useGetMemories } from "@/generated/api/default/default";
 
 export default function Page() {
-  const hasMemory = true;
+  const { data, isLoading } = useGetMemories();
+
+  const hasMemory = isLoading ? false : data?.data.length !== 0;
+  const memories = data?.data ?? [];
 
   return (
     <>
       <SearchForm />
       <div className="w-full h-full">
         {hasMemory ? (
-          <MemoryCard />
+          memories.map((memory) => (
+            <MemoryCard
+              key={memory.id}
+              occurredAt={memory.created_at ?? null}
+              title={memory.title ?? "タイトルなし"}
+              detail={memory.note ?? "詳細なし"}
+              location={memory.location ?? "場所なし"}
+              imageUrl={null}
+            />
+          ))
         ) : (
           <div className="h-full flex items-center justify-center ">
             まだ出来事がありません
