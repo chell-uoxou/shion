@@ -32,19 +32,26 @@ func main() {
 
 	defer postgres.DB.Close()
 
+	mux := http.NewServeMux()
+
+	// DBを操作するrepositoryを初期化
 	userRepo := postgres.NewUserRepository(postgres.DB)
 
+	// repo必要なルーターを初期化
 	practiceUserRouter := handler.NewPracticeUserRouter(userRepo)
 	authCallbackRouter := handler.NewAuthCallbackRouter(userRepo)
 	meRouter := handler.NewMeRouter(userRepo)
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/login", handler.LoginHandler)
+	// repo必要なハンドラを登録
 	mux.HandleFunc("/callback", authCallbackRouter.AuthCallbackHandler)
-	mux.HandleFunc("/health", handler.HealthHandler)
 	mux.HandleFunc("/practice/users", practiceUserRouter.PracticeUsersHandler)
 
+	// 認証が必要なハンドラを登録
 	mux.Handle("/me", middleware.RequireAuth(http.HandlerFunc(meRouter.MeHandler)))
+
+	// repo不要なハンドラを登録
+	mux.HandleFunc("/login", handler.LoginHandler)
+	mux.HandleFunc("/health", handler.HealthHandler)
 
 	// mux 全体に CORS ミドルウェアを適用
 	handler := middleware.WithCORS(mux, allowedOrigin)
