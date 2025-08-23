@@ -23,6 +23,22 @@ type MemoryRepository struct {
 	db *sql.DB
 }
 
+// MemoryFriend は memory_friends テーブルの1行に対応
+type MemoryFriend struct {
+	ID         int        `json:"id"`
+	MemoryID   int        `json:"memory_id"`
+	FriendID   int        `json:"friend_id"`
+	ReasonNote *string    `json:"reason_note"`
+	CreatedAt  time.Time  `json:"created_at"`
+	UpdatedAt  time.Time  `json:"updated_at"`
+	DeletedAt  *time.Time `json:"deleted_at"`
+}
+
+type FriendInput struct {
+	FriendID   int     `json:"friend_id"`
+	ReasonNote *string `json:"reason_note"`
+}
+
 func NewMemoryRepository(db *sql.DB) *MemoryRepository {
 	return &MemoryRepository{db: db}
 }
@@ -66,6 +82,36 @@ func (r *MemoryRepository) Get(id int) (*Memory, error) {
 	return &m, nil
 }
 
+// Get memory とその関連 friends を取得
+func (r *MemoryRepository) GetWithFriends(id int) (*Memory, []MemoryFriend, error) {
+	mem, err := r.Get(id)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	rows, err := r.db.Query(`
+        SELECT id, memory_id, friend_id, reason_note, created_at, updated_at, deleted_at
+        FROM memory_friends
+        WHERE memory_id = $1 AND deleted_at IS NULL
+    `, id)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer rows.Close()
+
+	var friends []MemoryFriend
+	for rows.Next() {
+		var mf MemoryFriend
+		if err := rows.Scan(&mf.ID, &mf.MemoryID, &mf.FriendID, &mf.ReasonNote,
+			&mf.CreatedAt, &mf.UpdatedAt, &mf.DeletedAt); err != nil {
+			return nil, nil, err
+		}
+		friends = append(friends, mf)
+	}
+
+	return mem, friends, nil
+}
+
 // Create 新しい memory を挿入
 func (r *MemoryRepository) Create(createdBy int, title, note, location string, occurredAt time.Time) (*Memory, error) {
 	var m Memory
@@ -77,6 +123,49 @@ func (r *MemoryRepository) Create(createdBy int, title, note, location string, o
 		&m.ID, &m.CreatedBy, &m.Title, &m.Note, &m.Location, &m.OccurredAt, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt,
 	)
 	if err != nil {
+		return nil, err
+	}
+	return &m, nil
+}
+
+// Create 新しい memory と関連する friend を一緒に挿入
+func (r *MemoryRepository) CreateWithFriends(
+	createdBy int,
+	title, note, location string,
+	occurredAt time.Time,
+	friends []FriendInput,
+) (*Memory, error) {
+	tx, err := r.db.Begin()
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+
+	var m Memory
+	err = tx.QueryRow(`
+        INSERT INTO memories (created_by, title, note, location, occurred_at)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING id, created_by, title, note, location, occurred_at, created_at, updated_at, deleted_at
+    `, createdBy, title, note, location, occurredAt).Scan(
+		&m.ID, &m.CreatedBy, &m.Title, &m.Note, &m.Location,
+		&m.OccurredAt, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	// friends も挿入
+	for _, f := range friends {
+		_, err := tx.Exec(`
+            INSERT INTO memory_friends (memory_id, friend_id, reason_note)
+            VALUES ($1, $2, $3)
+        `, m.ID, f.FriendID, f.ReasonNote)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
 		return nil, err
 	}
 	return &m, nil

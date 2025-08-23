@@ -44,6 +44,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
+
   /me:
     get:
       summary: Get current logged-in user
@@ -61,22 +62,20 @@ paths:
 
   /memories:
     get:
-      summary: List memories of the logged-in user
+      summary: Get all memories
       security:
         - cookieAuth: []
       responses:
         "200":
-          description: List of memories
+          description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: "#/components/schemas/Memory"
-        "401":
-          description: Unauthorized
     post:
-      summary: Create a new memory
+      summary: Create a new memory with related friends
       security:
         - cookieAuth: []
       requestBody:
@@ -92,6 +91,19 @@ paths:
                   type: string
                 location:
                   type: string
+                occurred_at:
+                  type: string
+                  format: date-time
+                friends:
+                  type: array
+                  description: 関連付ける友達と理由
+                  items:
+                    type: object
+                    properties:
+                      friend_id:
+                        type: integer
+                      reason_note:
+                        type: string
               required:
                 - title
       responses:
@@ -186,6 +198,137 @@ paths:
         "404":
           description: Not found
 
+  /friends:
+    get:
+      summary: List friends of the logged-in user
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: List of friends
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Friend"
+        "401":
+          description: Unauthorized
+    post:
+      summary: Create a new friend
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                display_name:
+                  type: string
+                note:
+                  type: string
+                avatar_color:
+                  type: string
+                avatar_icon:
+                  type: string
+              required:
+                - display_name
+      responses:
+        "201":
+          description: Friend created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Friend"
+        "401":
+          description: Unauthorized
+
+  /friends/{id}:
+    get:
+      summary: Get a specific friend
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Friend found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Friend"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden (not owned by current user)
+        "404":
+          description: Not found
+    put:
+      summary: Update a friend
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                display_name:
+                  type: string
+                note:
+                  type: string
+                avatar_color:
+                  type: string
+                avatar_icon:
+                  type: string
+              required:
+                - display_name
+      responses:
+        "200":
+          description: Friend updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Friend"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden (not owned by current user)
+        "404":
+          description: Not found
+    delete:
+      summary: Delete a friend (soft delete)
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted successfully
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden (not owned by current user)
+        "404":
+          description: Not found
+
 components:
   securitySchemes:
     cookieAuth:
@@ -221,6 +364,47 @@ components:
           type: string
         location:
           type: string
+        occurred_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        deleted_at:
+          type: string
+          format: date-time
+          nullable: true
+        friends:
+          type: array
+          items:
+            type: object
+            properties:
+              friend_id:
+                type: integer
+              reason_note:
+                type: string
+    Friend:
+      type: object
+      properties:
+        id:
+          type: integer
+        created_by:
+          type: integer
+        display_name:
+          type: string
+        note:
+          type: string
+        avatar_color:
+          type: string
+        avatar_icon:
+          type: string
+        last_selected_at:
+          type: string
+          format: date-time
+          nullable: true
         created_at:
           type: string
           format: date-time
