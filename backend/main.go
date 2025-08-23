@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"shion/handler"
+	"shion/middleware"
 	"shion/repository/postgres"
 
 	_ "github.com/lib/pq"
@@ -14,25 +15,6 @@ import (
 const SERVER_PORT = ":8080"
 
 var allowedOrigin = os.Getenv("ALLOWED_FRONTEND_ORIGIN")
-
-// CORS ミドルウェア
-func withCORS(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if allowedOrigin != "" {
-			w.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
-		}
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-		w.Header().Set("Vary", "Origin")
-
-		// プリフライトリクエストはここで終了
-		if r.Method == http.MethodOptions {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-		next.ServeHTTP(w, r)
-	})
-}
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("health 叩かれた！")
@@ -70,7 +52,7 @@ func main() {
 	mux.HandleFunc("/practice/users", practiceUseRouter.GetPracticeUsersHandler)
 
 	// mux 全体に CORS ミドルウェアを適用
-	handler := withCORS(mux)
+	handler := middleware.WithCORS(mux, allowedOrigin)
 
 	fmt.Printf("info: Listening on %s\n", SERVER_PORT)
 	if err := http.ListenAndServe(SERVER_PORT, handler); err != nil {
