@@ -14,23 +14,25 @@ export default function Page() {
   return (
     <>
       <SearchForm />
-      <div className="w-full h-full">
-        {hasMemory ? (
-          memories.map((memory) => (
-            <MemoryCard
-              key={memory.id}
-              occurredAt={memory.created_at ?? null}
-              title={memory.title ?? "タイトルなし"}
-              detail={memory.note ?? "詳細なし"}
-              location={memory.location ?? "場所なし"}
-              imageUrl={null}
-            />
-          ))
-        ) : (
-          <div className="h-full flex items-center justify-center ">
-            まだ出来事がありません
-          </div>
-        )}
+      <div className="w-full px-6 pt-12">
+        <div className="flex flex-col items-center gap-6">
+          {hasMemory ? (
+            memories.map((memory) => (
+              <MemoryCard
+                key={memory.id}
+                occurredAt={memory.created_at ?? null}
+                title={memory.title ?? "タイトルなし"}
+                detail={memory.note ?? "詳細なし"}
+                location={memory.location ?? "場所なし"}
+                imageUrl={null}
+              />
+            ))
+          ) : (
+            <div className="h-full flex items-center justify-center ">
+              まだ出来事がありません
+            </div>
+          )}
+        </div>
       </div>
       <CirclePlus className="fill-[#7C56B5] text-[#F4EFFA] w-16 h-16 fixed bottom-18 right-5" />
     </>
