@@ -35,8 +35,8 @@ type MemoryFriend struct {
 }
 
 type FriendInput struct {
-	FriendID   int
-	ReasonNote *string
+	FriendID   int     `json:"friend_id"`
+	ReasonNote *string `json:"reason_note"`
 }
 
 func NewMemoryRepository(db *sql.DB) *MemoryRepository {

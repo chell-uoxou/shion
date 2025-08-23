@@ -10,9 +10,13 @@ import {
   UserDetailDialog,
   UserSelectDialog,
 } from "@/features/friendpicker/components/FriendPickerView";
-import { useGetFriends } from "@/generated/api/default/default";
+import {
+  useGetFriends,
+  usePostMemories,
+} from "@/generated/api/default/default";
 import { Friend } from "@/generated/api/model";
-import UserRow, { UserIcon } from "@/features/FriendListitem/page";
+import { UserIcon } from "@/features/FriendListitem/page";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
   const [title, setTitle] = useState("");
@@ -27,7 +31,10 @@ export default function Page() {
   >([]);
 
   const { data: friendsData } = useGetFriends();
+  const { mutate: postMemory } = usePostMemories();
   const friends = friendsData?.data || [];
+
+  const router = useRouter();
 
   const today = new Date();
 
@@ -37,6 +44,22 @@ export default function Page() {
 
   const handleTextareaComplete = () => {
     if (details.trim() !== "") setDoneTextarea(true);
+  };
+
+  const handleClickSubmit = async () => {
+    await postMemory({
+      data: {
+        title,
+        note: details,
+        friends: memoryFriends.map((item) => {
+          return {
+            friend_id: item.friend.id,
+            reason_note: item.reason,
+          };
+        }),
+      },
+    });
+    router.push("/timeline");
   };
 
   return (
@@ -217,6 +240,7 @@ export default function Page() {
           <Button
             className="w-24 mb-8 bg-[var(--brand-violet-3)] text-white rounded-2xl"
             variant="default"
+            onClick={handleClickSubmit}
           >
             <Check />
           </Button>
