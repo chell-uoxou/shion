@@ -21,6 +21,9 @@ export default function Page() {
   const [selectOpen, setSelectOpen] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
+  const [memoryFriends, setMemoryFriends] = useState<
+    { friend: Friend; reason: string }[]
+  >([]);
 
   const { data: friendsData } = useGetFriends();
   const friends = friendsData?.data || [];
@@ -151,14 +154,19 @@ export default function Page() {
             <UserSelectDialog
               open={selectOpen}
               onOpenChange={setSelectOpen}
+              memoryFriends={memoryFriends}
+              setMemoryFriends={setMemoryFriends}
               friends={friends}
-              onConfirm={(selected) => {
-                if (selected.length > 0) {
-                  setSelectedFriend(selected[0]);
+              onSelectFriend={(selected) => {
+                if (selected) {
+                  setSelectedFriend(selected);
                   setDetailOpen(true);
                 }
                 setSelectOpen(false);
                 console.log("選択されたユーザー:", selected);
+              }}
+              onSave={() => {
+                setSelectOpen(false);
               }}
             />
             <UserDetailDialog
@@ -170,6 +178,10 @@ export default function Page() {
                 if (!isOpen) setSelectOpen(true); // 閉じたら選択ダイアログを再表示
               }}
               friend={selectedFriend}
+              onSave={(friend, reason) => {
+                setMemoryFriends((prev) => [...prev, { friend, reason }]);
+                setDetailOpen(false);
+              }}
             />
           </div>
           <p className="text-[var(--brand-violet-3)]">話し相手を追加</p>

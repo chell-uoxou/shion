@@ -12,28 +12,30 @@ import { Check, X } from "lucide-react";
 import UserRow from "@/features/FriendListitem/page";
 import { SearchForm } from "@/features/memoryTimeline/components/SearchForm";
 import { Friend } from "@/generated/api/model";
+import { Checkbox } from "@/components/ui/checkbox";
 
 type UserSelectDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  memoryFriends: { friend: Friend; reason: string }[];
+  setMemoryFriends: React.Dispatch<
+    React.SetStateAction<{ friend: Friend; reason: string }[]>
+  >;
   friends: Friend[];
-  onConfirm: (selected: Friend[]) => void;
+  onSelectFriend: (selected: Friend) => void;
+  onSave: () => void;
 };
-
-type UserDetailDialogProps = {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  friend: Friend | null;
-};
-
 // -------------------
 // ユーザー選択ダイアログ
 // -------------------
 export function UserSelectDialog({
   open,
   onOpenChange,
+  memoryFriends,
+  setMemoryFriends,
   friends,
-  onConfirm,
+  onSelectFriend,
+  onSave,
 }: UserSelectDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -52,17 +54,34 @@ export function UserSelectDialog({
 
         {/* ユーザーリスト */}
         <div className="max-h-[300px] overflow-y-auto space-y-2">
-          {friends.map((user) => (
-            <div
-              key={user.id}
-              className="cursor-pointer"
-              onClick={() => {
-                // クリックしたユーザーをそのまま選択して確定
-                onConfirm([user]);
-                onOpenChange(false);
-              }}
-            >
-              <UserRow src="/user-icon.svg" name={user.display_name || ""} />
+          {friends.map((friend) => (
+            <div key={friend.id} className="flex items-center space-x-3">
+              <Checkbox
+                checked={memoryFriends.some((m) => m.friend.id === friend.id)}
+                onCheckedChange={(checked) => {
+                  if (checked) {
+                    setMemoryFriends((prev) => [
+                      ...prev,
+                      { friend: friend, reason: "" },
+                    ]);
+                  } else {
+                    setMemoryFriends((prev) =>
+                      prev.filter((m) => m.friend.id !== friend.id)
+                    );
+                  }
+                }}
+              />
+              <div
+                className="cursor-pointer"
+                onClick={() => {
+                  onSelectFriend(friend);
+                }}
+              >
+                <UserRow
+                  src="/user-icon.svg"
+                  name={friend.display_name || ""}
+                />
+              </div>
             </div>
           ))}
         </div>
@@ -73,6 +92,7 @@ export function UserSelectDialog({
             type="button"
             className="w-35 h-14 rounded-xl bg-[var(--brand-violet-3)] flex items-center justify-center"
             aria-label="チェックボタン"
+            onClick={onSave}
           >
             <Check size={26} style={{ color: "var(--brand-violet-1)" }} />
           </button>
@@ -82,13 +102,20 @@ export function UserSelectDialog({
   );
 }
 
+type UserDetailDialogProps = {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  friend: Friend | null;
+  onSave: (friend: Friend, reason: string) => void;
+};
 // -------------------
-// 選択ユーザー詳細ダイアログ
+// 追加対象として選んだユーザーに、理由メモを添えるダイアログ
 // -------------------
 export function UserDetailDialog({
   open,
   onOpenChange,
   friend,
+  onSave,
 }: UserDetailDialogProps) {
   const [text, setText] = useState(""); // ← ここで state を作る
 
@@ -141,6 +168,10 @@ export function UserDetailDialog({
             type="button"
             className="w-35 h-14 rounded-xl bg-[var(--brand-violet-3)] flex items-center justify-center"
             aria-label="チェックボタン"
+            onClick={() => {
+              onSave(friend, text);
+              onOpenChange(false);
+            }}
           >
             <Check size={26} style={{ color: "var(--brand-violet-1)" }} />
           </button>
