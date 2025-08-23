@@ -38,7 +38,7 @@ export default function Page() {
             transition={{ duration: 0.5 }}
           >
             <img
-              src="/shion_svgs/アートボード3.svg"
+              src="/shion_svgs/artboard_3.svg"
               className="w-full h-full object-contain"
               alt="illustration"
             />
