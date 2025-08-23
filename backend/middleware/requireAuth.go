@@ -10,8 +10,7 @@ import (
 )
 
 type AuthClaims struct {
-	UserID string `json:"sub"`
-	Email  string `json:"email"`
+	Email string `json:"email"`
 	jwt.RegisteredClaims
 }
 
@@ -29,7 +28,7 @@ func RequireAuth(next http.Handler) http.Handler {
 		}
 
 		// JWT の検証
-		token, err := jwt.ParseWithClaims(cookie.Value, &AuthClaims{}, func(t *jwt.Token) (interface{}, error) {
+		token, err := jwt.ParseWithClaims(cookie.Value, &AuthClaims{RegisteredClaims: jwt.RegisteredClaims{}}, func(t *jwt.Token) (interface{}, error) {
 			return []byte(os.Getenv("JWT_SECRET")), nil
 		})
 		if err != nil || !token.Valid {

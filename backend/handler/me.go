@@ -33,12 +33,10 @@ func (router *MeRouter) MeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Printf("Auth claims in /me: %s\n", claims.UserID)
+	fmt.Printf("Auth claims in /me: %s\n", claims.Subject)
 
-	user, err := router.repo.GetUserByGoogleSub(claims.UserID)
+	user, err := router.repo.GetUserByGoogleSub(claims.Subject)
 	fmt.Printf("Fetched user from DB: %v\n", user)
-
-	fmt.Printf("Error fetching user: %v\n", err)
 
 	if err != nil {
 		http.Error(w, "server error", http.StatusInternalServerError)

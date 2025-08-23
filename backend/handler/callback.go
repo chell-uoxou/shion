@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"shion/middleware"
 	"shion/repository/postgres"
 	"time"
 
@@ -21,19 +22,19 @@ func NewAuthCallbackRouter(userRepo *postgres.UserRepository) *AuthCallbackRoute
 	return &AuthCallbackRouter{userRepo: userRepo}
 }
 
-func extractProfileFromIDToken(idToken string) (string, string, string, error) {
+func extractProfileFromIDToken(idToken string) (string, string, string, string, error) {
 	parser := jwt.NewParser()
 	claims := jwt.MapClaims{}
 	_, _, err := parser.ParseUnverified(idToken, claims)
 	if err != nil {
-		return "", "", "", err
+		return "", "", "", "", err
 	}
 
-	// email フィールドを取り出す
 	email, _ := claims["email"].(string)
+	name, _ := claims["name"].(string)
 	sub, _ := claims["sub"].(string)
 	avatar_url, _ := claims["picture"].(string)
-	return email, sub, avatar_url, nil
+	return email, name, sub, avatar_url, nil
 }
 
 func (router *AuthCallbackRouter) AuthCallbackHandler(w http.ResponseWriter, r *http.Request) {
@@ -57,7 +58,7 @@ func (router *AuthCallbackRouter) AuthCallbackHandler(w http.ResponseWriter, r *
 		return
 	}
 
-	email, sub, avatar_url, err := extractProfileFromIDToken(rawIDToken) // JWT decodeしてsub/email取得
+	email, name, sub, avatar_url, err := extractProfileFromIDToken(rawIDToken) // JWT decodeしてGoogleのプロフィール情報を取得
 	if err != nil {
 		http.Error(w, "invalid id_token", http.StatusInternalServerError)
 		return
@@ -67,7 +68,7 @@ func (router *AuthCallbackRouter) AuthCallbackHandler(w http.ResponseWriter, r *
 	user, err := router.userRepo.GetUserByGoogleSub(sub)
 	if user == nil || err == sql.ErrNoRows {
 		// ユーザーが存在しない場合は新規作成
-		user, err = router.userRepo.CreateUser(email, sql.NullString{String: avatar_url, Valid: true}, sql.NullString{String: sub, Valid: true})
+		user, err = router.userRepo.CreateUser(name, sql.NullString{String: avatar_url, Valid: true}, sql.NullString{String: sub, Valid: true})
 		if err != nil {
 			http.Error(w, "failed to create user", http.StatusInternalServerError)
 			return
@@ -77,10 +78,12 @@ func (router *AuthCallbackRouter) AuthCallbackHandler(w http.ResponseWriter, r *
 	fmt.Printf("info: User %s logged in\n", user.Name)
 
 	// 自前のJWTを発行
-	claims := jwt.MapClaims{
-		"email": email,
-		"exp":   time.Now().Add(time.Hour).Unix(),
-		"sub":   sub,
+	claims := &middleware.AuthClaims{
+		Email: email,
+		RegisteredClaims: jwt.RegisteredClaims{
+			Subject:   sub,
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(30 * 24 * time.Hour)),
+		},
 	}
 	myToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	signed, _ := myToken.SignedString([]byte(os.Getenv("JWT_SECRET")))
