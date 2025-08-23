@@ -39,6 +39,7 @@ func main() {
 	// DBを操作するrepositoryを初期化
 	userRepo := postgres.NewUserRepository(postgres.DB)
 	memoryRepo := postgres.NewMemoryRepository(postgres.DB)
+	friendRepo := postgres.NewFriendRepository(postgres.DB)
 
 	// // repo必要なルーターを初期化
 	// practiceUserRouter := practice.NewPracticeUserRouter(userRepo)
@@ -64,8 +65,8 @@ func main() {
 	authRouter.Register(mux)
 
 	// friends
-	// friendRouter := friend.NewRouter(friendRepo)
-	// friendRouter.Register(mux)
+	friendRouter := resource.NewFriendRouter(friendRepo, userRepo)
+	friendRouter.Register(mux)
 
 	// memories
 	memoryRouter := resource.NewMemoryRouter(memoryRepo, userRepo)

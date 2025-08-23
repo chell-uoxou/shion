@@ -5,14 +5,11 @@ import { useRouter } from "next/navigation";
 import MemoryCard from "@/features/memoryTimeline/components/MemoryCard";
 import { SearchForm } from "@/features/memoryTimeline/components/SearchForm";
 import { useGetMemories } from "@/generated/api/default/default";
-import LoadingSpinner from "@/components/LoadingSpinner";
 import LoadingWithText from "@/components/LoadingWithText";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export default function Page() {
   const { data, isLoading } = useGetMemories();
-  const router = useRouter();
 
   const hasMemory = isLoading ? false : data?.data.length !== 0;
   const memories = data?.data ?? [];

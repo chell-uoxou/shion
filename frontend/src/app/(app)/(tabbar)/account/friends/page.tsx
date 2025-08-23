@@ -5,10 +5,9 @@ import UserRow from "@/features/FriendListitem/page"; // パスは実際の場�
 import { ChevronLeft, UserRoundPlus } from "lucide-react";
 import Link from "next/link";
 import { CreateFriendDialog } from "@/features/CreateNewFriend/create"; // ダイアログのインポート
+import LoadingWithText from "@/components/LoadingWithText";
 
 export default function Page() {
-  const [open, setOpen] = useState(false);
-
   return (
     <main className="p-4 space-y-6">
       {/* ヘッダー */}
@@ -28,7 +27,17 @@ export default function Page() {
 
       {/* ユーザー一覧 */}
       <div className="space-y-4">
-        <UserRow src="/user-icon.svg" name="ユーザー1" />
+        {isLoading ? (
+          <LoadingWithText />
+        ) : (
+          friends.map((friend) => (
+            <UserRow
+              key={friend.id}
+              src="/user-icon.svg"
+              name={friend.display_name || "Unknown User"}
+            />
+          ))
+        )}
       </div>
 
       {/* 丸い追加ボタン */}
@@ -57,7 +66,3 @@ export default function Page() {
     </main>
   );
 }
-
-
-
-
