@@ -1,7 +1,12 @@
 import Image from "next/image";
 import React from "react";
-import { Edit3, Trash2, Settings, Info, ChevronRight, UsersRound, KeyRound } from "lucide-react";
-
+import {
+  Edit3,
+  Trash2,
+  ChevronRight,
+  UsersRound,
+  KeyRound,
+} from "lucide-react";
 
 type UserIconProps = {
   src: string;
@@ -10,7 +15,12 @@ type UserIconProps = {
   className?: string;
 };
 
-const UserIcon: React.FC<UserIconProps> = ({ src, alt = "user icon", size = 48, className }) => {
+const UserIcon: React.FC<UserIconProps> = ({
+  src,
+  alt = "user icon",
+  size = 48,
+  className,
+}) => {
   return (
     <Image
       src={src}
@@ -39,12 +49,23 @@ const UserProfile: React.FC<UserProfileProps> = ({ src, name, size = 100 }) => {
 };
 
 export default function Page() {
-
   const buttons = [
-    { label: "話し相手一覧", leftIcon: <UsersRound size={20} /> },
-    { label: "プロフィール編集", leftIcon: <Edit3 size={20} /> },
-    { label: "パスワード変更", leftIcon: <KeyRound size={20} /> },
-    { label: "アカウント削除", leftIcon: <Trash2 size={20} /> },
+    {
+      label: "話し相手一覧",
+      leftIcon: <UsersRound size={20} className="color-brand-violet-2" />,
+    },
+    {
+      label: "プロフィール編集",
+      leftIcon: <Edit3 size={20} className="color-brand-violet-2" />,
+    },
+    {
+      label: "パスワード変更",
+      leftIcon: <KeyRound size={20} className="color-brand-violet-2" />,
+    },
+    {
+      label: "アカウント削除",
+      leftIcon: <Trash2 size={20} className="color-brand-violet-2" />,
+    },
   ];
 
   return (
@@ -58,19 +79,19 @@ export default function Page() {
             key={index}
             className="flex items-center justify-between w-64 px-4 py-3 rounded-lg shadow-md hover:shadow-lg transition"
             style={{
-              backgroundColor: "white",               // 背景色
-              color: "var(--primary)",               // 文字色
-              border: "2px solid var(--secondary)",  // 枠線
+              backgroundColor: "white", // 背景色
+              color: "var(--brand-violet-4)", // 文字色
+              border: "2px solid var(--brand-violet-3)", // 枠線
             }}
           >
             {/* 左アイコン + ラベル */}
-            <div className="flex items-center space-x-2">
-              {React.cloneElement(btn.leftIcon, { color: "var(--thirdly)", size: 20 })}
+            <div className="flex items-center gap-x-2">
+              <div>{btn.leftIcon}</div>
               <span>{btn.label}</span>
             </div>
 
             {/* 右の矢印 */}
-            {React.createElement(ChevronRight, { color: "var(--thirdly)", size: 20 })}
+            <ChevronRight className="color-brand-violet-2" size={20} />
           </button>
         ))}
       </div>
