@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
@@ -15,16 +14,6 @@ import (
 const SERVER_PORT = ":8080"
 
 var allowedOrigin = os.Getenv("ALLOWED_FRONTEND_ORIGIN")
-
-func healthHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("health 叩かれた！")
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{
-		"status":  "ok",
-		"message": "うごいてるよ",
-	})
-}
 
 func main() {
 	fmt.Println("info: Launching shion backend...")
@@ -48,8 +37,8 @@ func main() {
 	practiceUseRouter := handler.NewPracticeUserRouter(userRepo)
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/health", healthHandler)
-	mux.HandleFunc("/practice/users", practiceUseRouter.GetPracticeUsersHandler)
+	mux.HandleFunc("/health", handler.HealthHandler)
+	mux.HandleFunc("/practice/users", practiceUseRouter.PracticeUsersHandler)
 
 	// mux 全体に CORS ミドルウェアを適用
 	handler := middleware.WithCORS(mux, allowedOrigin)

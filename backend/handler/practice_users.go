@@ -7,7 +7,7 @@ import (
 	"shion/repository/postgres"
 )
 
-type User struct {
+type UserResponse struct {
 	ID        int    `json:"id"`
 	Name      string `json:"name"`
 	AvatarUrl string `json:"avatar_url"`
@@ -23,7 +23,7 @@ func NewPracticeUserRouter(repo *postgres.UserRepository) *PracticeUserRouter {
 	return &PracticeUserRouter{repo: repo}
 }
 
-func (router *PracticeUserRouter) GetPracticeUsersHandler(w http.ResponseWriter, r *http.Request) {
+func (router *PracticeUserRouter) PracticeUsersHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("info: Handling GetPracticeUsers request")
 
 	w.Header().Set("Content-Type", "application/json")
@@ -34,11 +34,11 @@ func (router *PracticeUserRouter) GetPracticeUsersHandler(w http.ResponseWriter,
 	}
 
 	// DBのユーザー型をハンドラ用のUser型に変換
-	users := make([]User, len(dbUsers))
+	users := make([]UserResponse, len(dbUsers))
 
 	for i, u := range dbUsers {
 		fmt.Println("info: Retrieved user:", u.Name)
-		users[i] = User{
+		users[i] = UserResponse{
 			ID:        u.ID,
 			Name:      u.Name,
 			AvatarUrl: u.AvatarUrl.String,
