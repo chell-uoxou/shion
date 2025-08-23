@@ -22,9 +22,9 @@ export default function Page() {
           className="w-[90%] mx-auto"
         ></textarea>
       </div>
-      <div className="flex flex-col items-center bg-[var(--light)] border-[var(--thirdly)] border-2 rounded-2xl mx-10">
-        <p className="text-[var(--thirdly)]">1/2</p>
-        <p className="text-[var(--secondary)]">
+      <div className="flex flex-col items-center bg-[var(--brand-violet-1)] border-[var(--brand-violet-2)] border-2 rounded-2xl mx-10">
+        <p className="text-[var(--brand-violet-2)]">1/2</p>
+        <p className="text-[var(--brand-violet-3)]">
           そのできごとや発見を一言で表すと？
         </p>
       </div>
