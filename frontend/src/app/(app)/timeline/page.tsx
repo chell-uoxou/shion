@@ -4,6 +4,8 @@ import { CirclePlus } from "lucide-react";
 import MemoryCard from "@/features/memoryTimeline/components/MemoryCard";
 import { SearchForm } from "@/features/memoryTimeline/components/SearchForm";
 import { useGetMemories } from "@/generated/api/default/default";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import LoadingWithText from "@/components/LoadingWithText";
 
 export default function Page() {
   const { data, isLoading } = useGetMemories();
@@ -16,7 +18,9 @@ export default function Page() {
       <SearchForm />
       <div className="w-full px-6 pt-12">
         <div className="flex flex-col items-center gap-6">
-          {hasMemory ? (
+          {isLoading ? (
+            <LoadingWithText />
+          ) : hasMemory ? (
             memories.map((memory) => (
               <MemoryCard
                 key={memory.id}
