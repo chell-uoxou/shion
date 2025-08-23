@@ -12,8 +12,8 @@ export default function Page() {
     <div className="p-5">
       {user && (
         <div>
-          <h2>Welcome, {user.name}!</h2>
-          <p>Email: {user.id}</p>
+          <h2>Welcome, {user.name}</h2>
+          <p>userid: {user.id}</p>
         </div>
       )}
       <div className="flex flex-col gap-4">

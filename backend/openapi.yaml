@@ -44,7 +44,26 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
+  /me:
+    get:
+      summary: Get current logged-in user
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
 components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: app_token
   schemas:
     User:
       type: object
