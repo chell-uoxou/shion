@@ -85,8 +85,8 @@ export default function Page() {
             }}
           >
             {/* 左アイコン + ラベル */}
-            <div className="flex items-center space-x-2">
-              {btn.leftIcon}
+            <div className="flex items-center gap-x-2">
+              <div>{btn.leftIcon}</div>
               <span>{btn.label}</span>
             </div>
 
