@@ -61,23 +61,8 @@ paths:
           description: Unauthorized
 
   /memories:
-    get:
-      summary: List memories of the logged-in user
-      security:
-        - cookieAuth: []
-      responses:
-        "200":
-          description: List of memories
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Memory"
-        "401":
-          description: Unauthorized
     post:
-      summary: Create a new memory
+      summary: Create a new memory with related friends
       security:
         - cookieAuth: []
       requestBody:
@@ -93,8 +78,21 @@ paths:
                   type: string
                 location:
                   type: string
-              required:
-                - title
+                occurred_at:
+                  type: string
+                  format: date-time
+                friends:
+                  type: array
+                  description: 関連付ける友達と理由
+                  items:
+                    type: object
+                    properties:
+                      friend_id:
+                        type: integer
+                      reason_note:
+                        type: string
+            required:
+              - title
       responses:
         "201":
           description: Memory created
@@ -353,6 +351,9 @@ components:
           type: string
         location:
           type: string
+        occurred_at:
+          type: string
+          format: date-time
         created_at:
           type: string
           format: date-time
@@ -363,6 +364,15 @@ components:
           type: string
           format: date-time
           nullable: true
+        friends:
+          type: array
+          items:
+            type: object
+            properties:
+              friend_id:
+                type: integer
+              reason_note:
+                type: string
     Friend:
       type: object
       properties:
