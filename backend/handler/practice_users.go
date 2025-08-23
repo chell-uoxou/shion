@@ -5,14 +5,15 @@ import (
 	"fmt"
 	"net/http"
 	"shion/repository/postgres"
+	"time"
 )
 
 type UserResponse struct {
-	ID        int    `json:"id"`
-	Name      string `json:"name"`
-	AvatarUrl string `json:"avatar_url"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
+	ID        int       `json:"id"`
+	Name      string    `json:"name"`
+	AvatarUrl string    `json:"avatar_url"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type PracticeUserRouter struct {

@@ -35,12 +35,15 @@ func main() {
 	userRepo := postgres.NewUserRepository(postgres.DB)
 
 	practiceUserRouter := handler.NewPracticeUserRouter(userRepo)
+	meRouter := handler.NewMeRouter(userRepo)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/login", handler.LoginHandler)
 	mux.HandleFunc("/callback", handler.AuthCallbackHandler)
 	mux.HandleFunc("/health", handler.HealthHandler)
 	mux.HandleFunc("/practice/users", practiceUserRouter.PracticeUsersHandler)
+
+	mux.Handle("/me", middleware.RequireAuth(http.HandlerFunc(meRouter.MeHandler)))
 
 	// mux 全体に CORS ミドルウェアを適用
 	handler := middleware.WithCORS(mux, allowedOrigin)

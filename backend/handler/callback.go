@@ -10,17 +10,18 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func extractEmailFromIDToken(idToken string) (string, error) {
+func extractEmailAndSubFromIDToken(idToken string) (string, string, error) {
 	parser := jwt.NewParser()
 	claims := jwt.MapClaims{}
 	_, _, err := parser.ParseUnverified(idToken, claims)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	// email フィールドを取り出す
 	email, _ := claims["email"].(string)
-	return email, nil
+	sub, _ := claims["sub"].(string)
+	return email, sub, nil
 }
 
 func AuthCallbackHandler(w http.ResponseWriter, r *http.Request) {
@@ -44,7 +45,7 @@ func AuthCallbackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	email, err := extractEmailFromIDToken(rawIDToken) // JWT decodeしてsub/email取得
+	email, sub, err := extractEmailAndSubFromIDToken(rawIDToken) // JWT decodeしてsub/email取得
 	if err != nil {
 		http.Error(w, "invalid id_token", http.StatusInternalServerError)
 		return
@@ -54,6 +55,7 @@ func AuthCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	claims := jwt.MapClaims{
 		"email": email,
 		"exp":   time.Now().Add(time.Hour).Unix(),
+		"sub":   sub,
 	}
 	myToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	signed, _ := myToken.SignedString([]byte(os.Getenv("JWT_SECRET")))

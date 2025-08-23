@@ -3,6 +3,7 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
+	"time"
 )
 
 type UserRepository struct {
@@ -13,13 +14,31 @@ type User struct {
 	ID        int
 	Name      string
 	AvatarUrl sql.NullString
-	CreatedAt string
-	UpdatedAt string
-	DeletedAt sql.NullString
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt sql.NullTime
+	GoogleSub sql.NullString
 }
 
 func NewUserRepository(db *sql.DB) *UserRepository {
 	return &UserRepository{db: db}
+}
+
+func (r *UserRepository) GetUserByGoogleSub(sub string) (*User, error) {
+	var user User
+	err := r.db.QueryRow(`
+		SELECT id, name, avatar_url, created_at, updated_at, deleted_at, google_sub
+		FROM users 
+		WHERE google_sub = $1`, sub).
+		Scan(&user.ID, &user.Name, &user.AvatarUrl, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt, &user.GoogleSub)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &user, nil
 }
 
 func (r *UserRepository) GetUserByID(id int) (*User, error) {
@@ -29,7 +48,6 @@ func (r *UserRepository) GetUserByID(id int) (*User, error) {
 		FROM users 
 		WHERE id = $1`, id).Scan(&user.ID, &user.Name, &user.AvatarUrl, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt)
 
-	// これは何
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
