@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-
-	"database/sql"
+	"shion/handler"
+	"shion/repository/postgres"
 
 	_ "github.com/lib/pq"
 )
@@ -53,26 +53,21 @@ func main() {
 		fmt.Println("info: ALLOWED_FRONTEND_ORIGIN is set to", allowedOrigin)
 	}
 
-	dsn := os.Getenv("DATABASE_URL")
-
-	if dsn == "" {
-		fmt.Println("error: DATABASE_URL is not set")
+	err := postgres.InitDB()
+	if err != nil {
+		fmt.Println("error: Database connection failed:", err)
 		return
-	} else {
-		fmt.Println("info: DATABASE_URL is set to", dsn)
-		db, err := sql.Open("postgres", dsn)
-
-		if err != nil {
-			fmt.Println("error: Database connection failed:", err)
-			return
-		} else {
-			fmt.Println("info: Database connection established.")
-		}
-		defer db.Close()
 	}
+
+	defer postgres.DB.Close()
+
+	userRepo := postgres.NewUserRepository(postgres.DB)
+
+	practiceUseRouter := handler.NewPracticeUserRouter(userRepo)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", healthHandler)
+	mux.HandleFunc("/practice/users", practiceUseRouter.GetPracticeUsersHandler)
 
 	// mux 全体に CORS ミドルウェアを適用
 	handler := withCORS(mux)
