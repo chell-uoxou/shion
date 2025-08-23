@@ -27,7 +27,7 @@ func NewMeRouter(repo *postgres.UserRepository) *MeRouter {
 
 func (router *MeRouter) MeHandler(w http.ResponseWriter, r *http.Request) {
 	// 認証情報を context から取り出す
-	claims, err := middleware.GetAuthUser(r)
+	claims, err := middleware.GetAuthClaims(r)
 	if err != nil {
 		http.Error(w, "unauthorized", http.StatusUnauthorized)
 		return

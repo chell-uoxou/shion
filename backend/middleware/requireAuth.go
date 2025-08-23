@@ -17,7 +17,10 @@ type AuthClaims struct {
 
 type contextKey string
 
-const userContextKey = contextKey("user")
+const (
+	userContextKey   = contextKey("user")
+	claimsContextKey = contextKey("claims")
+)
 
 // RequireAuth ミドルウェア
 func RequireAuth(userRepo *postgres.UserRepository, next http.Handler) http.Handler {
@@ -50,17 +53,28 @@ func RequireAuth(userRepo *postgres.UserRepository, next http.Handler) http.Hand
 			return
 		}
 
-		// context に user を埋め込む
-		ctx := context.WithValue(r.Context(), userContextKey, user)
+		// context に両方入れる
+		ctx := r.Context()
+		ctx = context.WithValue(ctx, claimsContextKey, claims)
+		ctx = context.WithValue(ctx, userContextKey, user)
+
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 
 // ヘルパー: ハンドラからユーザー情報を取り出す
-func GetAuthUser(r *http.Request) (*AuthClaims, error) {
-	claims, ok := r.Context().Value(userContextKey).(*AuthClaims)
+func GetAuthClaims(r *http.Request) (*AuthClaims, error) {
+	claims, ok := r.Context().Value(claimsContextKey).(*AuthClaims)
+	if !ok {
+		return nil, fmt.Errorf("no auth claims in context")
+	}
+	return claims, nil
+}
+
+func GetAuthUser(r *http.Request) (*postgres.User, error) {
+	user, ok := r.Context().Value(userContextKey).(*postgres.User)
 	if !ok {
 		return nil, fmt.Errorf("no auth user in context")
 	}
-	return claims, nil
+	return user, nil
 }

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 	"shion/handler/auth"
-	"shion/handler/practice"
+	"shion/handler/resource"
 	"shion/handler/system"
 	"shion/middleware"
 	"shion/repository/postgres"
@@ -38,22 +38,38 @@ func main() {
 
 	// DBを操作するrepositoryを初期化
 	userRepo := postgres.NewUserRepository(postgres.DB)
+	memoryRepo := postgres.NewMemoryRepository(postgres.DB)
 
-	// repo必要なルーターを初期化
-	practiceUserRouter := practice.NewPracticeUserRouter(userRepo)
-	authCallbackRouter := auth.NewAuthCallbackRouter(userRepo)
-	meRouter := auth.NewMeRouter(userRepo)
+	// // repo必要なルーターを初期化
+	// practiceUserRouter := practice.NewPracticeUserRouter(userRepo)
+	// authCallbackRouter := auth.NewAuthCallbackRouter(userRepo)
+	// meRouter := auth.NewMeRouter(userRepo)
 
-	// repo必要なハンドラを登録
-	mux.HandleFunc("/callback", authCallbackRouter.AuthCallbackHandler)
-	mux.HandleFunc("/practice/users", practiceUserRouter.PracticeUsersHandler)
+	// // repo必要なハンドラを登録
+	// mux.HandleFunc("/callback", authCallbackRouter.AuthCallbackHandler)
+	// mux.HandleFunc("/practice/users", practiceUserRouter.PracticeUsersHandler)
 
-	// 認証が必要なハンドラを登録
-	mux.Handle("/me", middleware.RequireAuth(http.HandlerFunc(meRouter.MeHandler)))
+	// // 認証が必要なハンドラを登録
+	// mux.Handle("/me", middleware.RequireAuth(http.HandlerFunc(meRouter.MeHandler)))
 
-	// repo不要なハンドラを登録
-	mux.HandleFunc("/login", auth.LoginHandler)
+	// // repo不要なハンドラを登録
+	// mux.HandleFunc("/login", auth.LoginHandler)
+	// mux.HandleFunc("/health", system.HealthHandler)
+
+	// system
 	mux.HandleFunc("/health", system.HealthHandler)
+
+	// auth
+	authRouter := auth.NewRouter(userRepo)
+	authRouter.Register(mux)
+
+	// friends
+	// friendRouter := friend.NewRouter(friendRepo)
+	// friendRouter.Register(mux)
+
+	// memories
+	memoryRouter := resource.NewMemoryRouter(memoryRepo, userRepo)
+	memoryRouter.Register(mux)
 
 	// mux 全体に CORS ミドルウェアを適用
 	handler := middleware.WithCORS(mux, allowedOrigin)
