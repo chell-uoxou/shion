@@ -39,7 +39,7 @@ func (r *MemoryRepository) List(userID int) ([]Memory, error) {
 	}
 	defer rows.Close()
 
-	var memories []Memory
+	memories := []Memory{} // ← nil ではなく空スライスで初期化
 	for rows.Next() {
 		var m Memory
 		if err := rows.Scan(&m.ID, &m.CreatedBy, &m.Title, &m.Note, &m.Location, &m.CreatedAt, &m.UpdatedAt, &m.DeletedAt); err != nil {
