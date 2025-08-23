@@ -11,6 +11,7 @@ import {
   KeyRound,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 type UserIconProps = {
   src: string;
@@ -79,10 +80,16 @@ export default function Page() {
 
   return (
     <main className="flex flex-col items-center mt-4">
-      <UserProfile
-        src={user?.avatar_url ?? "/user-icon.svg"}
-        name={user?.name ?? "Unknown User"}
-      />
+      {isLoading ? (
+        <div className="h-[176px] flex items-center justify-center">
+          <LoadingSpinner />
+        </div>
+      ) : (
+        <UserProfile
+          src={user?.avatar_url ?? "/user-icon.svg"}
+          name={user?.name ?? "Unknown User"}
+        />
+      )}
 
       {/* ボタン群 */}
       <div className="flex flex-col items-center mt-6 space-y-5">
