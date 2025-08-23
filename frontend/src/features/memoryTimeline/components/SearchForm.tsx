@@ -3,7 +3,7 @@ import { Search } from "lucide-react";
 
 export const SearchForm = () => {
   return (
-    <div className="flex justify-center relative max-w-[90%] mx-auto my-12">
+    <div className="flex justify-center relative max-w-[90%] mx-auto my-2">
       {/* shadcn/ui の Input を使う */}
       <Input
         type="text"
@@ -11,6 +11,7 @@ export const SearchForm = () => {
       />
       <button
         className="absolute right-0 m-1"
+        aria-label="検索ボタン"
         onClick={() => {
           console.log("押した");
         }}
