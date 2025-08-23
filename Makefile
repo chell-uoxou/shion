@@ -21,5 +21,9 @@ remove:
 
 setup:
 	docker compose build
+	make checkout
+
+checkout:
 	cd backend && go mod tidy
 	cd frontend && npm install
+	cd frontend && npm run orval
