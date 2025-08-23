@@ -17,7 +17,7 @@ const MemoryCard = (props: MemoryCardProps) => {
   const day = date ? date.toLocaleDateString("ja-JP", { weekday: "long" }) : "";
 
   return (
-    <div className="max-w-md bg-purple-200 rounded-xl shadow-md p-4 flex items-start space-x-4">
+    <div className="max-w-md bg-purple-200 rounded-xl shadow-md p-4 flex items-start space-x-4 w-full">
       {/* 左側 日付 */}
       <div className="flex flex-col items-center w-16 text-purple-900">
         <span className="text-sm">

@@ -81,23 +81,34 @@ func (r *MemoryRouter) Create(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// リクエストボディ構造
 	var body struct {
-		Title      string    `json:"title"`
-		Note       string    `json:"note"`
-		Location   string    `json:"location"`
-		OccurredAt time.Time `json:"occurred_at"`
+		Title      string                 `json:"title"`
+		Note       string                 `json:"note"`
+		Location   string                 `json:"location"`
+		OccurredAt time.Time              `json:"occurred_at"`
+		Friends    []postgres.FriendInput `json:"friends"`
 	}
 	if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
 		http.Error(w, "invalid body", http.StatusBadRequest)
 		return
 	}
 
-	memory, err := r.memoryRepo.Create(user.ID, body.Title, body.Note, body.Location, body.OccurredAt)
+	// Memory + Friends をまとめて作成
+	memory, err := r.memoryRepo.CreateWithFriends(
+		user.ID,
+		body.Title,
+		body.Note,
+		body.Location,
+		body.OccurredAt,
+		body.Friends,
+	)
 	if err != nil {
 		http.Error(w, "failed to create memory", http.StatusInternalServerError)
 		return
 	}
 
+	// JSON レスポンス
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(memory)
