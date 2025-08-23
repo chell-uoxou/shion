@@ -1,14 +1,18 @@
 "use client";
 import { CirclePlus } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import MemoryCard from "@/features/memoryTimeline/components/MemoryCard";
 import { SearchForm } from "@/features/memoryTimeline/components/SearchForm";
 import { useGetMemories } from "@/generated/api/default/default";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import LoadingWithText from "@/components/LoadingWithText";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function Page() {
   const { data, isLoading } = useGetMemories();
+  const router = useRouter();
 
   const hasMemory = isLoading ? false : data?.data.length !== 0;
   const memories = data?.data ?? [];
@@ -38,7 +42,9 @@ export default function Page() {
           )}
         </div>
       </div>
-      <CirclePlus className="fill-[#7C56B5] text-[#F4EFFA] w-16 h-16 fixed bottom-18 right-5" />
+      <Link href="/memories/new">
+        <CirclePlus className="fill-[var(--brand-violet-3)] text-[var(--brand-violet-1)] w-16 h-16 fixed bottom-18 right-5" />
+      </Link>
     </>
   );
 }

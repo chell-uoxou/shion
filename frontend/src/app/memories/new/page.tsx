@@ -6,15 +6,30 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Check, UserRoundPlus, Plus, MapPlus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  User,
+  UserDetailDialog,
+  UserSelectDialog,
+} from "@/features/friendpicker/components/FriendPickerView";
 
 export default function Page() {
   const [title, setTitle] = useState("");
   const [details, setDetails] = useState("");
   const [doneInput, setDoneInput] = useState(false);
   const [doneTextarea, setDoneTextarea] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [selectOpen, setSelectOpen] = useState(false);
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const today = new Date();
 
+  // ダミーユーザー
+  const users = [
+    { id: "1", name: "ユーザー1" },
+    { id: "2", name: "ユーザー2" },
+    { id: "3", name: "ユーザー3" },
+  ];
   const handleInputComplete = () => {
     if (title.trim() !== "") setDoneInput(true);
   };
@@ -130,11 +145,35 @@ export default function Page() {
         >
           <div>
             <Button
+              onClick={() => setSelectOpen(true)}
               variant="link"
               className="border-2 border-dashed rounded-full text-[var(--brand-violet-3)]"
             >
               <UserRoundPlus />
             </Button>
+            <UserSelectDialog
+              open={selectOpen}
+              onOpenChange={setSelectOpen}
+              users={users}
+              onConfirm={(selected) => {
+                if (selected.length > 0) {
+                  setSelectedUser(selected[0]);
+                  setDetailOpen(true);
+                }
+                setSelectOpen(false);
+                console.log("選択されたユーザー:", selected);
+              }}
+            />
+            <UserDetailDialog
+              open={detailOpen}
+              onOpenChange={(
+                isOpen: boolean | ((prevState: boolean) => boolean)
+              ) => {
+                setDetailOpen(isOpen); // 詳細ダイアログの開閉
+                if (!isOpen) setSelectOpen(true); // 閉じたら選択ダイアログを再表示
+              }}
+              user={selectedUser}
+            />
           </div>
           <p className="text-[var(--brand-violet-3)]">話し相手を追加</p>
 
