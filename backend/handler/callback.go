@@ -2,29 +2,41 @@ package handler
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
+	"shion/repository/postgres"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func extractEmailAndSubFromIDToken(idToken string) (string, string, error) {
+type AuthCallbackRouter struct {
+	userRepo *postgres.UserRepository
+}
+
+func NewAuthCallbackRouter(userRepo *postgres.UserRepository) *AuthCallbackRouter {
+	return &AuthCallbackRouter{userRepo: userRepo}
+}
+
+func extractProfileFromIDToken(idToken string) (string, string, string, error) {
 	parser := jwt.NewParser()
 	claims := jwt.MapClaims{}
 	_, _, err := parser.ParseUnverified(idToken, claims)
 	if err != nil {
-		return "", "", err
+		return "", "", "", err
 	}
 
 	// email フィールドを取り出す
 	email, _ := claims["email"].(string)
 	sub, _ := claims["sub"].(string)
-	return email, sub, nil
+	avatar_url, _ := claims["picture"].(string)
+	return email, sub, avatar_url, nil
 }
 
-func AuthCallbackHandler(w http.ResponseWriter, r *http.Request) {
+func (router *AuthCallbackRouter) AuthCallbackHandler(w http.ResponseWriter, r *http.Request) {
 	var body struct {
 		Code string `json:"code"`
 	}
@@ -45,11 +57,24 @@ func AuthCallbackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	email, sub, err := extractEmailAndSubFromIDToken(rawIDToken) // JWT decodeしてsub/email取得
+	email, sub, avatar_url, err := extractProfileFromIDToken(rawIDToken) // JWT decodeしてsub/email取得
 	if err != nil {
 		http.Error(w, "invalid id_token", http.StatusInternalServerError)
 		return
 	}
+
+	// ユーザーの存在を確認
+	user, err := router.userRepo.GetUserByGoogleSub(sub)
+	if user == nil || err == sql.ErrNoRows {
+		// ユーザーが存在しない場合は新規作成
+		user, err = router.userRepo.CreateUser(email, sql.NullString{String: avatar_url, Valid: true}, sql.NullString{String: sub, Valid: true})
+		if err != nil {
+			http.Error(w, "failed to create user", http.StatusInternalServerError)
+			return
+		}
+	}
+
+	fmt.Printf("info: User %s logged in\n", user.Name)
 
 	// 自前のJWTを発行
 	claims := jwt.MapClaims{

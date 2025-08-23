@@ -77,13 +77,13 @@ func (r *UserRepository) GetAllUsers() ([]*User, error) {
 	return users, nil
 }
 
-func (r *UserRepository) CreateUser(name string, avatarUrl sql.NullString) (*User, error) {
+func (r *UserRepository) CreateUser(name string, avatarUrl sql.NullString, googleSub sql.NullString) (*User, error) {
 	var user User
 	err := r.db.QueryRow(`
-		INSERT INTO users (name, avatar_url) 
-		VALUES ($1, $2) 
-		RETURNING id, name, avatar_url, created_at, updated_at, deleted_at`,
-		name, avatarUrl).Scan(&user.ID, &user.Name, &user.AvatarUrl, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt)
+		INSERT INTO users (name, avatar_url, google_sub) 
+		VALUES ($1, $2, $3) 
+		RETURNING id, name, avatar_url, created_at, updated_at, deleted_at, google_sub`,
+		name, avatarUrl, googleSub).Scan(&user.ID, &user.Name, &user.AvatarUrl, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt, &user.GoogleSub)
 
 	fmt.Println(user.ID)
 

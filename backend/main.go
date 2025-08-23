@@ -35,11 +35,12 @@ func main() {
 	userRepo := postgres.NewUserRepository(postgres.DB)
 
 	practiceUserRouter := handler.NewPracticeUserRouter(userRepo)
+	authCallbackRouter := handler.NewAuthCallbackRouter(userRepo)
 	meRouter := handler.NewMeRouter(userRepo)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/login", handler.LoginHandler)
-	mux.HandleFunc("/callback", handler.AuthCallbackHandler)
+	mux.HandleFunc("/callback", authCallbackRouter.AuthCallbackHandler)
 	mux.HandleFunc("/health", handler.HealthHandler)
 	mux.HandleFunc("/practice/users", practiceUserRouter.PracticeUsersHandler)
 
