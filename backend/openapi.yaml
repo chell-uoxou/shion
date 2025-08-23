@@ -61,6 +61,19 @@ paths:
           description: Unauthorized
 
   /memories:
+    get:
+      summary: Get all memories
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Memory"
     post:
       summary: Create a new memory with related friends
       security:
@@ -91,8 +104,8 @@ paths:
                         type: integer
                       reason_note:
                         type: string
-            required:
-              - title
+              required:
+                - title
       responses:
         "201":
           description: Memory created
