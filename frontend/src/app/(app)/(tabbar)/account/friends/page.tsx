@@ -6,8 +6,13 @@ import { ChevronLeft, UserRoundPlus } from "lucide-react";
 import Link from "next/link";
 import { CreateFriendDialog } from "@/features/CreateNewFriend/create"; // ダイアログのインポート
 import LoadingWithText from "@/components/LoadingWithText";
+import { useGetFriends } from "@/generated/api/default/default";
 
 export default function Page() {
+  const [open, setOpen] = useState(false);
+  const { isLoading, data: friendsData } = useGetFriends();
+  const friends = friendsData?.data || [];
+
   return (
     <main className="p-4 space-y-6">
       {/* ヘッダー */}
