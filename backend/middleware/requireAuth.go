@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"shion/repository/postgres"
 
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -19,7 +20,7 @@ type contextKey string
 const userContextKey = contextKey("user")
 
 // RequireAuth ミドルウェア
-func RequireAuth(next http.Handler) http.Handler {
+func RequireAuth(userRepo *postgres.UserRepository, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("app_token")
 		if err != nil {
@@ -27,7 +28,7 @@ func RequireAuth(next http.Handler) http.Handler {
 			return
 		}
 
-		// JWT の検証
+		// JWT 検証
 		token, err := jwt.ParseWithClaims(cookie.Value, &AuthClaims{RegisteredClaims: jwt.RegisteredClaims{}}, func(t *jwt.Token) (interface{}, error) {
 			return []byte(os.Getenv("JWT_SECRET")), nil
 		})
@@ -42,10 +43,15 @@ func RequireAuth(next http.Handler) http.Handler {
 			return
 		}
 
-		fmt.Printf("Authenticated user: %v\n", claims)
+		// DBでユーザー解決（google_sub → users.id）
+		user, err := userRepo.GetUserByGoogleSub(claims.Subject)
+		if err != nil || user == nil {
+			http.Error(w, "unauthorized: user not found", http.StatusUnauthorized)
+			return
+		}
 
-		// ユーザー情報を context に埋め込む
-		ctx := context.WithValue(r.Context(), userContextKey, claims)
+		// context に user を埋め込む
+		ctx := context.WithValue(r.Context(), userContextKey, user)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
