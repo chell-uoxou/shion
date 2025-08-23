@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import LoadingWithText from "@/components/LoadingWithText";
 
 export default function CallbackPage() {
   const router = useRouter();
@@ -23,10 +24,14 @@ export default function CallbackPage() {
         return res.text();
       })
       .then(() => {
-        router.push("/"); // ログイン後トップに戻す
+        router.push("/timeline"); // ログイン後トップに戻す
       })
       .catch((err) => console.error(err));
   }, [params, router]);
 
-  return <p>ログイン処理中...</p>;
+  return (
+    <div className="h-svh w-full flex items-center justify-center">
+      <LoadingWithText text="ログイン中..." />
+    </div>
+  );
 }
