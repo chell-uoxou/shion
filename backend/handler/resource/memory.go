@@ -6,6 +6,7 @@ import (
 	"shion/middleware"
 	"shion/repository/postgres"
 	"strconv"
+	"time"
 )
 
 type MemoryRouter struct {
@@ -81,16 +82,17 @@ func (r *MemoryRouter) Create(w http.ResponseWriter, req *http.Request) {
 	}
 
 	var body struct {
-		Title    string `json:"title"`
-		Note     string `json:"note"`
-		Location string `json:"location"`
+		Title      string    `json:"title"`
+		Note       string    `json:"note"`
+		Location   string    `json:"location"`
+		OccurredAt time.Time `json:"occurred_at"`
 	}
 	if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
 		http.Error(w, "invalid body", http.StatusBadRequest)
 		return
 	}
 
-	memory, err := r.memoryRepo.Create(user.ID, body.Title, body.Note, body.Location)
+	memory, err := r.memoryRepo.Create(user.ID, body.Title, body.Note, body.Location, body.OccurredAt)
 	if err != nil {
 		http.Error(w, "failed to create memory", http.StatusInternalServerError)
 		return
@@ -133,9 +135,10 @@ func (r *MemoryRouter) Update(w http.ResponseWriter, req *http.Request, id int) 
 	}
 
 	var body struct {
-		Title    string `json:"title"`
-		Note     string `json:"note"`
-		Location string `json:"location"`
+		Title      string    `json:"title"`
+		Note       string    `json:"note"`
+		Location   string    `json:"location"`
+		OccurredAt time.Time `json:"occurred_at"`
 	}
 	if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
 		http.Error(w, "invalid body", http.StatusBadRequest)
@@ -152,7 +155,7 @@ func (r *MemoryRouter) Update(w http.ResponseWriter, req *http.Request, id int) 
 		return
 	}
 
-	updated, err := r.memoryRepo.Update(id, body.Title, body.Note, body.Location)
+	updated, err := r.memoryRepo.Update(id, body.Title, body.Note, body.Location, body.OccurredAt)
 	if err != nil {
 		http.Error(w, "failed to update memory", http.StatusInternalServerError)
 		return
