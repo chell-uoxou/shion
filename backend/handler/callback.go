@@ -82,11 +82,14 @@ func (router *AuthCallbackRouter) AuthCallbackHandler(w http.ResponseWriter, r *
 		Email: email,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Subject:   sub,
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(30 * 24 * time.Hour)),
+			ExpiresAt: jwt.NewNumericDate(token.Expiry),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 	}
 	myToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	signed, _ := myToken.SignedString([]byte(os.Getenv("JWT_SECRET")))
+
+	fmt.Println("info: jwt created: " + signed)
 
 	// HttpOnly Cookie に保存
 	http.SetCookie(w, &http.Cookie{
