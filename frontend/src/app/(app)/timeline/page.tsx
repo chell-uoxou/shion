@@ -1,5 +1,6 @@
 "use client";
-import { CirclePlus } from "lucide-react";
+import { ChevronLeft, CirclePlus } from "lucide-react";
+import { useSearchParams, useRouter } from "next/navigation";
 
 import MemoryCard from "@/features/memoryTimeline/components/MemoryCard";
 import { SearchForm } from "@/features/memoryTimeline/components/SearchForm";
@@ -9,13 +10,32 @@ import LoadingWithText from "@/components/LoadingWithText";
 
 export default function Page() {
   const { data, isLoading } = useGetMemories();
-
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const hasMemory = isLoading ? false : data?.data.length !== 0;
   const memories = data?.data ?? [];
 
+  const friendIdFilter = searchParams.get("friend_id");
+  console.log(friendIdFilter);
+  const friendName = searchParams.get("friend_name") ?? "";
+
+  const handleback = () => {
+    router.push("/recent");
+  };
   return (
     <>
-      <SearchForm />
+      {friendIdFilter ? (
+        <div className="relative flex items-center justify-center py-2">
+          <div className="absolute left-1" onClick={handleback}>
+            <ChevronLeft size={28} className="cursor-pointer text-primary" />
+          </div>
+          <h1 className="text-2xl text-center text-primary">
+            {friendIdFilter}の話し相手
+          </h1>
+        </div>
+      ) : (
+        <SearchForm />
+      )}
       <div className="w-full px-6 pt-12">
         <div className="flex flex-col items-center gap-6">
           {isLoading ? (
