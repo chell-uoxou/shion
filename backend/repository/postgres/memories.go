@@ -7,14 +7,14 @@ import (
 
 // Memory は memories テーブルの1行に対応
 type Memory struct {
-	ID        int            `json:"id"`
-	CreatedBy int            `json:"created_by"`
-	Title     string         `json:"title"`
-	Note      sql.NullString `json:"note"`
-	Location  sql.NullString `json:"location"`
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
-	DeletedAt sql.NullTime   `json:"deleted_at"`
+	ID        int        `json:"id"`
+	CreatedBy int        `json:"created_by"`
+	Title     string     `json:"title"`
+	Note      *string    `json:"note"`
+	Location  *string    `json:"location"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
+	DeletedAt *time.Time `json:"deleted_at"`
 }
 
 // MemoryRepository は memories テーブルを操作する
