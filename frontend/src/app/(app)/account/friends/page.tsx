@@ -3,6 +3,7 @@
 import React from "react";
 import UserRow from "@/features/FriendListitem/page"; // パスは実際の場所に合わせて調整
 import { ChevronLeft, UserRoundPlus } from "lucide-react";
+import Link from "next/link";
 
 export default function Page() {
   return (
@@ -10,9 +11,11 @@ export default function Page() {
       {/* ヘッダー */}
       <div className="relative flex items-center justify-center py-2">
         <div className="absolute left-1">
-          <ChevronLeft size={28} className="cursor-pointer text-primary" />
+          <Link href="/account">
+          <ChevronLeft size={28} className="cursor-pointer text-[var(--brand-violet-4)]" />
+          </Link>
         </div>
-        <h1 className="text-2xl text-center text-primary">話し相手一覧</h1>
+        <h1 className="text-2xl text-center text-[var(--brand-violet-4)]">話し相手一覧</h1>
       </div>
 
       {/* ユーザー一覧 */}
@@ -28,14 +31,14 @@ export default function Page() {
           bottom-18 right-5   /* 右下からの余白 */
           w-16 h-16
           rounded-full
-          bg-secondary
+          bg-[var(--brand-violet-3)]
           flex items-center justify-center
         "
         aria-label="話し相手追加ボタン"
       >
         <UserRoundPlus
           size={26}
-          style={{ color: "var(--light)" }}
+          style={{ color: "var(--brand-violet-1)" }}
         />
       </button>
     </main>
