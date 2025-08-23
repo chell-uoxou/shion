@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import React from "react";
 import Link from "next/link";
@@ -8,6 +10,7 @@ import {
   UsersRound,
   KeyRound,
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 type UserIconProps = {
   src: string;
@@ -53,7 +56,9 @@ export default function Page() {
   const buttons = [
     {
       label: "話し相手一覧",
-      leftIcon: <UsersRound size={20} className="text-[var(--brand-violet-2)]" />,
+      leftIcon: (
+        <UsersRound size={20} className="text-[var(--brand-violet-2)]" />
+      ),
       href: "/account/friends",
     },
     {
@@ -70,9 +75,14 @@ export default function Page() {
     },
   ];
 
+  const { user, isLoading } = useAuth();
+
   return (
     <main className="flex flex-col items-center mt-4">
-      <UserProfile src="/user-icon.svg" name="ユーザー1" />
+      <UserProfile
+        src={user?.avatar_url ?? "/user-icon.svg"}
+        name={user?.name ?? "Unknown User"}
+      />
 
       {/* ボタン群 */}
       <div className="flex flex-col items-center mt-6 space-y-5">
@@ -91,7 +101,10 @@ export default function Page() {
                 <div>{btn.leftIcon}</div>
                 <span>{btn.label}</span>
               </div>
-              <ChevronRight className="text-[var(--brand-violet-2)]" size={20} />
+              <ChevronRight
+                className="text-[var(--brand-violet-2)]"
+                size={20}
+              />
             </button>
           );
 
@@ -105,7 +118,6 @@ export default function Page() {
             </div>
           );
         })}
-
       </div>
     </main>
   );
