@@ -1,0 +1,6 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+include_ext = ["go", "tpl", "tmpl", "html"]
+exclude_dir = ["assets", "tmp", "vendor"]
