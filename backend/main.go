@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"shion/handler"
+	"shion/handler/auth"
+	"shion/handler/practice"
+	"shion/handler/system"
 	"shion/middleware"
 	"shion/repository/postgres"
 
@@ -38,9 +40,9 @@ func main() {
 	userRepo := postgres.NewUserRepository(postgres.DB)
 
 	// repo必要なルーターを初期化
-	practiceUserRouter := handler.NewPracticeUserRouter(userRepo)
-	authCallbackRouter := handler.NewAuthCallbackRouter(userRepo)
-	meRouter := handler.NewMeRouter(userRepo)
+	practiceUserRouter := practice.NewPracticeUserRouter(userRepo)
+	authCallbackRouter := auth.NewAuthCallbackRouter(userRepo)
+	meRouter := auth.NewMeRouter(userRepo)
 
 	// repo必要なハンドラを登録
 	mux.HandleFunc("/callback", authCallbackRouter.AuthCallbackHandler)
@@ -50,8 +52,8 @@ func main() {
 	mux.Handle("/me", middleware.RequireAuth(http.HandlerFunc(meRouter.MeHandler)))
 
 	// repo不要なハンドラを登録
-	mux.HandleFunc("/login", handler.LoginHandler)
-	mux.HandleFunc("/health", handler.HealthHandler)
+	mux.HandleFunc("/login", auth.LoginHandler)
+	mux.HandleFunc("/health", system.HealthHandler)
 
 	// mux 全体に CORS ミドルウェアを適用
 	handler := middleware.WithCORS(mux, allowedOrigin)
