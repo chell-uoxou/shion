@@ -6,7 +6,7 @@ const Page = () => {
 
   return (
     <div>
-      <h1>localhost shion backend health check</h1>
+      <h1>shion API Server Health Check</h1>
       {isLoading && <p>Loading...</p>}
       {data && <p>{data.data.message}</p>}
       {error && <p>Error: {error.message}</p>}
