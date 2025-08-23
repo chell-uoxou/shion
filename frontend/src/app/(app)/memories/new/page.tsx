@@ -12,6 +12,7 @@ import {
 } from "@/features/friendpicker/components/FriendPickerView";
 import { useGetFriends } from "@/generated/api/default/default";
 import { Friend } from "@/generated/api/model";
+import UserRow, { UserIcon } from "@/features/FriendListitem/page";
 
 export default function Page() {
   const [title, setTitle] = useState("");
@@ -143,49 +144,61 @@ export default function Page() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <div>
-            <Button
-              onClick={() => setSelectOpen(true)}
-              variant="link"
-              className="border-2 border-dashed rounded-full text-[var(--brand-violet-3)]"
-            >
-              <UserRoundPlus />
-            </Button>
-            <UserSelectDialog
-              open={selectOpen}
-              onOpenChange={setSelectOpen}
-              memoryFriends={memoryFriends}
-              setMemoryFriends={setMemoryFriends}
-              friends={friends}
-              onSelectFriend={(selected) => {
-                if (selected) {
-                  setSelectedFriend(selected);
-                  setDetailOpen(true);
-                }
-                setSelectOpen(false);
-                console.log("選択されたユーザー:", selected);
-              }}
-              onSave={() => {
-                setSelectOpen(false);
-              }}
-            />
-            <UserDetailDialog
-              open={detailOpen}
-              onOpenChange={(
-                isOpen: boolean | ((prevState: boolean) => boolean)
-              ) => {
-                setDetailOpen(isOpen); // 詳細ダイアログの開閉
-                if (!isOpen) setSelectOpen(true); // 閉じたら選択ダイアログを再表示
-              }}
-              friend={selectedFriend}
-              onSave={(friend, reason) => {
-                setMemoryFriends((prev) => [...prev, { friend, reason }]);
-                setDetailOpen(false);
-              }}
-            />
-          </div>
-          <p className="text-[var(--brand-violet-3)]">話し相手を追加</p>
+          {memoryFriends.length == 0 ? (
+            <div className="flex flex-col items-center gap-3">
+              <Button
+                onClick={() => setSelectOpen(true)}
+                variant="link"
+                className="border-2 border-dashed rounded-full text-[var(--brand-violet-3)]"
+              >
+                <UserRoundPlus />
+              </Button>
+              <p className="text-[var(--brand-violet-3)]">話し相手を追加</p>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-3">
+              {memoryFriends.map((friend) => (
+                <UserIcon
+                  key={friend.friend.id}
+                  src={friend.friend.avatar_icon || "/user-icon.svg"}
+                  size={60}
+                />
+              ))}
+            </div>
+          )}
 
+          <UserSelectDialog
+            open={selectOpen}
+            onOpenChange={setSelectOpen}
+            memoryFriends={memoryFriends}
+            setMemoryFriends={setMemoryFriends}
+            friends={friends}
+            onSelectFriend={(selected) => {
+              if (selected) {
+                setSelectedFriend(selected);
+                setDetailOpen(true);
+              }
+              setSelectOpen(false);
+              console.log("選択されたユーザー:", selected);
+            }}
+            onSave={() => {
+              setSelectOpen(false);
+            }}
+          />
+          <UserDetailDialog
+            open={detailOpen}
+            onOpenChange={(
+              isOpen: boolean | ((prevState: boolean) => boolean)
+            ) => {
+              setDetailOpen(isOpen); // 詳細ダイアログの開閉
+              if (!isOpen) setSelectOpen(true); // 閉じたら選択ダイアログを再表示
+            }}
+            friend={selectedFriend}
+            onSave={(friend, reason) => {
+              setMemoryFriends((prev) => [...prev, { friend, reason }]);
+              setDetailOpen(false);
+            }}
+          />
           <div className="flex space-x-6 mb-8">
             <div className="flex flex-col items-center space-y-2 p-4 border-2 border-dashed rounded-2xl text-[var(--brand-violet-3)]">
               <Button variant="link">
