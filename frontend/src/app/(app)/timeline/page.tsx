@@ -1,27 +1,15 @@
 "use client";
-import { CirclePlus, Search } from "lucide-react";
+import { CirclePlus } from "lucide-react";
 
 import MemoryCard from "@/features/memoryTimeline/components/MemoryCard";
+import { SearchForm } from "@/features/memoryTimeline/components/SearchForm";
 
 export default function Page() {
   const hasMemory = true;
 
   return (
     <>
-      <div className="flex justify-center relative max-w-[90%] mx-auto">
-        <input
-          type="text"
-          className="w-full h-8 bg-white border-2 rounded-xl border-[#A19EA7] p-2"
-        />
-        <button
-          className="absolute right-0 m-1"
-          onClick={() => {
-            console.log("押した");
-          }}
-        >
-          <Search />
-        </button>
-      </div>
+      <SearchForm />
       <div className="w-full h-full">
         {hasMemory ? (
           <MemoryCard />
