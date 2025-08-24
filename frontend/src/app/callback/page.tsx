@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import LoadingWithText from "@/components/LoadingWithText";
+import { API_BASE_URL } from "@/lib/env";
 
 export default function CallbackPage() {
   const router = useRouter();
@@ -13,7 +14,7 @@ export default function CallbackPage() {
     if (!code) return;
 
     // 認可コードをGoバックエンドに送る
-    fetch("http://localhost:8080/callback", {
+    fetch(`${API_BASE_URL}/callback`, {
       method: "POST",
       credentials: "include", // ← Cookieを受け取るため必須
       headers: { "Content-Type": "application/json" },

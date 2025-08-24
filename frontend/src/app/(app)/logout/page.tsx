@@ -1,12 +1,13 @@
 "use client";
 
+import { API_BASE_URL } from "@/lib/env";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 export default function LogoutPage() {
   const router = useRouter();
   useEffect(() => {
-    fetch("http://localhost:8080/logout", {
+    fetch(`${API_BASE_URL}/logout`, {
       method: "POST",
       credentials: "include",
     }).then(() => {
