@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,6 +9,7 @@ import {
   DialogOverlay,
 } from "@/components/ui/dialog";
 import { X, Check } from "lucide-react";
+import { usePostFriends } from "@/generated/api/default/default";
 
 type User = {
   id: string;
@@ -28,6 +29,22 @@ export function CreateFriendDialog({
 }: CreateFriendDialogProps) {
   const [text1, setText1] = useState("");
   const [text2, setText2] = useState("");
+
+  const { mutate: createFriend } = usePostFriends();
+
+  const handleSubmit = async () => {
+    await createFriend({ data: { display_name: text1, note: text2 } });
+    onOpenChange(false);
+    setText1("");
+    setText2("");
+  };
+
+  useEffect(() => {
+    if (open) {
+      setText1("");
+      setText2("");
+    }
+  }, [open]);
 
   if (!user) return null;
 
@@ -79,6 +96,7 @@ export function CreateFriendDialog({
             type="button"
             className="w-35 h-14 rounded-xl bg-[var(--brand-violet-3)] flex items-center justify-center"
             aria-label="チェックボタン"
+            onClick={handleSubmit}
           >
             <Check size={26} style={{ color: "var(--brand-violet-1)" }} />
           </button>
