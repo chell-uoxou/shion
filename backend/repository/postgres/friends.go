@@ -108,6 +108,16 @@ func (r *FriendRepository) Update(id int, displayName, note, avatarColor, avatar
 	return &f, nil
 }
 
+// 特定のidのfriendの最終選択時を今に更新
+func (r *FriendRepository) UpdateLastSelected(id int) error {
+	_, err := r.db.Exec(`
+		UPDATE friends
+		SET last_selected_at=NOW()
+		WHERE id=$1 AND deleted_at IS NULL
+	`, id)
+	return err
+}
+
 // Delete 論理削除
 func (r *FriendRepository) Delete(id int) error {
 	_, err := r.db.Exec(`

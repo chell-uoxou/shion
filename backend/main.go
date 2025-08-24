@@ -69,7 +69,7 @@ func main() {
 	friendRouter.Register(mux)
 
 	// memories
-	memoryRouter := resource.NewMemoryRouter(memoryRepo, userRepo)
+	memoryRouter := resource.NewMemoryRouter(memoryRepo, userRepo, friendRepo)
 	memoryRouter.Register(mux)
 
 	// mux 全体に CORS ミドルウェアを適用
