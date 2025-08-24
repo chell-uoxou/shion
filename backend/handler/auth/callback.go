@@ -99,8 +99,8 @@ func (router *AuthCallbackRouter) AuthCallbackHandler(w http.ResponseWriter, r *
 		Name:     "app_token",
 		Value:    signed,
 		HttpOnly: true,
-		Secure:   false, // 本番はtrue + HTTPS必須
-		SameSite: http.SameSiteLaxMode,
+		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
 		Path:     "/",
 	})
 
