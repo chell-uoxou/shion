@@ -72,6 +72,10 @@ func main() {
 	memoryRouter := resource.NewMemoryRouter(memoryRepo, userRepo, friendRepo)
 	memoryRouter.Register(mux)
 
+	// recent_friends
+	recentFriendRouter := resource.NewRecentMemoryRouter(memoryRepo, userRepo, friendRepo)
+	recentFriendRouter.Register(mux)
+
 	// mux 全体に CORS ミドルウェアを適用
 	handler := middleware.WithCORS(mux, allowedOrigin)
 
