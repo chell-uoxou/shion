@@ -16,8 +16,9 @@ func NewRouter(userRepo *postgres.UserRepository) *Router {
 
 // Register は認証系エンドポイントを mux に登録する
 func (r *Router) Register(mux *http.ServeMux) {
-	// /login は repo不要なのでそのまま
+	//repo不要
 	mux.HandleFunc("/login", LoginHandler)
+	mux.HandleFunc("/logout", LogoutHandler)
 
 	// /callback は repo必要
 	callbackRouter := NewAuthCallbackRouter(r.userRepo)
@@ -26,4 +27,5 @@ func (r *Router) Register(mux *http.ServeMux) {
 	// /me は認証必須
 	meRouter := NewMeRouter(r.userRepo)
 	mux.Handle("/me", middleware.RequireAuth(r.userRepo, http.HandlerFunc(meRouter.MeHandler)))
+
 }
