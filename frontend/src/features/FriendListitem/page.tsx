@@ -7,7 +7,11 @@ type UserIconProps = {
   size?: number;
 };
 
-const UserIcon: React.FC<UserIconProps> = ({ src, alt = "user icon", size = 48 }) => {
+export const UserIcon: React.FC<UserIconProps> = ({
+  src,
+  alt = "user icon",
+  size = 48,
+}) => {
   return (
     <Image
       src={src}
@@ -20,8 +24,8 @@ const UserIcon: React.FC<UserIconProps> = ({ src, alt = "user icon", size = 48 }
 };
 
 type UserRowProps = {
-  src: string;      // ユーザーアイコン画像
-  name: string;     // ユーザー名
+  src: string; // ユーザーアイコン画像
+  name: string; // ユーザー名
   iconSize?: number;
 };
 

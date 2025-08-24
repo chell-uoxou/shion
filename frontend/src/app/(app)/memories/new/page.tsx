@@ -6,12 +6,35 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Check, UserRoundPlus, Plus, MapPlus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  UserDetailDialog,
+  UserSelectDialog,
+} from "@/features/friendpicker/components/FriendPickerView";
+import {
+  useGetFriends,
+  usePostMemories,
+} from "@/generated/api/default/default";
+import { Friend } from "@/generated/api/model";
+import { UserIcon } from "@/features/FriendListitem/page";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
   const [title, setTitle] = useState("");
   const [details, setDetails] = useState("");
   const [doneInput, setDoneInput] = useState(false);
   const [doneTextarea, setDoneTextarea] = useState(false);
+  const [selectOpen, setSelectOpen] = useState(false);
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
+  const [memoryFriends, setMemoryFriends] = useState<
+    { friend: Friend; reason: string }[]
+  >([]);
+
+  const { data: friendsData } = useGetFriends();
+  const { mutate: postMemory } = usePostMemories();
+  const friends = friendsData?.data || [];
+
+  const router = useRouter();
 
   const today = new Date();
 
@@ -21,6 +44,22 @@ export default function Page() {
 
   const handleTextareaComplete = () => {
     if (details.trim() !== "") setDoneTextarea(true);
+  };
+
+  const handleClickSubmit = async () => {
+    await postMemory({
+      data: {
+        title,
+        note: details,
+        friends: memoryFriends.map((item) => {
+          return {
+            friend_id: item.friend.id,
+            reason_note: item.reason,
+          };
+        }),
+      },
+    });
+    router.push("/timeline");
   };
 
   return (
@@ -128,16 +167,61 @@ export default function Page() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <div>
-            <Button
-              variant="link"
-              className="border-2 border-dashed rounded-full text-[var(--brand-violet-3)]"
-            >
-              <UserRoundPlus />
-            </Button>
-          </div>
-          <p className="text-[var(--brand-violet-3)]">話し相手を追加</p>
+          {memoryFriends.length == 0 ? (
+            <div className="flex flex-col items-center gap-3">
+              <Button
+                onClick={() => setSelectOpen(true)}
+                variant="link"
+                className="border-2 border-dashed rounded-full text-[var(--brand-violet-3)]"
+              >
+                <UserRoundPlus />
+              </Button>
+              <p className="text-[var(--brand-violet-3)]">話し相手を追加</p>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-3">
+              {memoryFriends.map((friend) => (
+                <UserIcon
+                  key={friend.friend.id}
+                  src={friend.friend.avatar_icon || "/user-icon.svg"}
+                  size={60}
+                />
+              ))}
+            </div>
+          )}
 
+          <UserSelectDialog
+            open={selectOpen}
+            onOpenChange={setSelectOpen}
+            memoryFriends={memoryFriends}
+            setMemoryFriends={setMemoryFriends}
+            friends={friends}
+            onSelectFriend={(selected) => {
+              if (selected) {
+                setSelectedFriend(selected);
+                setDetailOpen(true);
+              }
+              setSelectOpen(false);
+              console.log("選択されたユーザー:", selected);
+            }}
+            onSave={() => {
+              setSelectOpen(false);
+            }}
+          />
+          <UserDetailDialog
+            open={detailOpen}
+            onOpenChange={(
+              isOpen: boolean | ((prevState: boolean) => boolean)
+            ) => {
+              setDetailOpen(isOpen); // 詳細ダイアログの開閉
+              if (!isOpen) setSelectOpen(true); // 閉じたら選択ダイアログを再表示
+            }}
+            friend={selectedFriend}
+            onSave={(friend, reason) => {
+              setMemoryFriends((prev) => [...prev, { friend, reason }]);
+              setDetailOpen(false);
+            }}
+          />
           <div className="flex space-x-6 mb-8">
             <div className="flex flex-col items-center space-y-2 p-4 border-2 border-dashed rounded-2xl text-[var(--brand-violet-3)]">
               <Button variant="link">
@@ -156,6 +240,7 @@ export default function Page() {
           <Button
             className="w-24 mb-8 bg-[var(--brand-violet-3)] text-white rounded-2xl"
             variant="default"
+            onClick={handleClickSubmit}
           >
             <Check />
           </Button>

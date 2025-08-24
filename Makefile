@@ -26,7 +26,6 @@ setup:
 
 checkout:
 	make start
-	cd backend && go mod tidy
 	cd frontend && npm install
 	cd frontend && npm run orval
 	make migrate-up
