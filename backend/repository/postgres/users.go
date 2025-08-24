@@ -85,7 +85,7 @@ func (r *UserRepository) CreateUser(name string, avatarUrl sql.NullString, googl
 		RETURNING id, name, avatar_url, created_at, updated_at, deleted_at, google_sub`,
 		name, avatarUrl, googleSub).Scan(&user.ID, &user.Name, &user.AvatarUrl, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt, &user.GoogleSub)
 
-	fmt.Println(user.ID)
+	fmt.Printf("user created: %d\n", user.ID)
 
 	if err != nil {
 		return nil, err

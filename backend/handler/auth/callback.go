@@ -67,6 +67,9 @@ func (router *AuthCallbackRouter) AuthCallbackHandler(w http.ResponseWriter, r *
 	// ユーザーの存在を確認
 	user, err := router.userRepo.GetUserByGoogleSub(sub)
 	if user == nil || err == sql.ErrNoRows {
+
+		println("info: User not found, creating new user")
+
 		// ユーザーが存在しない場合は新規作成
 		user, err = router.userRepo.CreateUser(name, sql.NullString{String: avatar_url, Valid: true}, sql.NullString{String: sub, Valid: true})
 		if err != nil {
