@@ -30,12 +30,12 @@ export default function Page() {
   return (
     <div className="h-[calc(100vh-120px)] flex flex-col w-full">
       {friendIdFilter ? (
-        <div className="relative flex items-center justify-center py-2">
-          <div className="absolute left-1" onClick={handleback}>
+        <div className="relative flex items-center justify-center py-2 h-20">
+          <div className="absolute left-2" onClick={handleback}>
             <ChevronLeft size={28} className="cursor-pointer text-primary" />
           </div>
-          <h1 className="text-2xl text-center text-primary">
-            {filteringFriendData?.data.display_name}
+          <h1 className="text-lg text-center text-primary">
+            {filteringFriendData?.data.display_name} さんに伝えたいできごと
           </h1>
         </div>
       ) : (
@@ -59,8 +59,9 @@ export default function Page() {
               />
             ))
           ) : (
-            <div className="h-full flex items-center justify-center ">
-              まだ出来事がありません
+            <div className="h-full flex items-center justify-center text-center">
+              できごとがありません <br />
+              右下のボタンから追加しましょう
             </div>
           )}
         </div>
