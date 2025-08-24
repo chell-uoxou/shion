@@ -4,7 +4,10 @@ import { useSearchParams, useRouter } from "next/navigation";
 
 import MemoryCard from "@/features/memoryTimeline/components/MemoryCard";
 import { SearchForm } from "@/features/memoryTimeline/components/SearchForm";
-import { useGetMemories } from "@/generated/api/default/default";
+import {
+  useGetFriendsId,
+  useGetMemories,
+} from "@/generated/api/default/default";
 import LoadingWithText from "@/components/LoadingWithText";
 import Link from "next/link";
 
@@ -16,6 +19,7 @@ export default function Page() {
   const { data, isLoading } = useGetMemories(
     friendIdFilter ? { friend_id: Number(friendIdFilter) } : undefined
   );
+  const { data: filteringFriendData } = useGetFriendsId(Number(friendIdFilter));
   const hasMemory = isLoading ? false : data?.data.length !== 0;
   const memories = data?.data ?? [];
   console.log(friendIdFilter);
@@ -31,7 +35,7 @@ export default function Page() {
             <ChevronLeft size={28} className="cursor-pointer text-primary" />
           </div>
           <h1 className="text-2xl text-center text-primary">
-            {friendIdFilter}の話し相手
+            {filteringFriendData?.data.display_name}
           </h1>
         </div>
       ) : (
