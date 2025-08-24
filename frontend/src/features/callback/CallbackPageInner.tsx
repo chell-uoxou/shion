@@ -1,11 +1,15 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import LoadingWithText from "@/components/LoadingWithText";
 import { API_BASE_URL } from "@/lib/env";
+import { Frown } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-export default function CallbackPage() {
+export default function CallbackPageInner() {
+  const [isFailed, setIsFailed] = useState(false);
+
   const router = useRouter();
   const params = useSearchParams();
 
@@ -27,12 +31,30 @@ export default function CallbackPage() {
       .then(() => {
         router.push("/timeline"); // ログイン後トップに戻す
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        console.error(err);
+        setIsFailed(true);
+      });
   }, [params, router]);
 
   return (
     <div className="h-svh w-full flex items-center justify-center">
-      <LoadingWithText text="ログイン中..." />
+      {isFailed ? (
+        <div className="text-center flex flex-col items-center gap-4">
+          <Frown size={36} />
+          ログインに失敗しました。
+          <br />
+          再度お試しください。
+          <Button
+            onClick={() => router.push("/login")}
+            className="bg-black text-white"
+          >
+            ログイン画面に戻る
+          </Button>
+        </div>
+      ) : (
+        <LoadingWithText text="ログイン中..." />
+      )}
     </div>
   );
 }
