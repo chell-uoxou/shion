@@ -62,18 +62,28 @@ paths:
 
   /memories:
     get:
-      summary: Get all memories
+      summary: List memories (optionally filtered by friend)
       security:
         - cookieAuth: []
+      parameters:
+        - in: query
+          name: friend_id
+          required: false
+          schema:
+            type: integer
+          description: 絞り込み対象の friend ID
       responses:
         "200":
-          description: OK
+          description: List of memories
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: "#/components/schemas/Memory"
+        "401":
+          description: Unauthorized
+
     post:
       summary: Create a new memory with related friends
       security:

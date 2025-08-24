@@ -219,3 +219,35 @@ func (r *MemoryRepository) GetLatestByFriend(friendID int) (*Memory, error) {
 	}
 	return &mem, nil
 }
+
+// ListByFriend 特定の friend に関連する memories を返す
+func (r *MemoryRepository) ListByFriend(userID int, friendID int) ([]Memory, error) {
+	rows, err := r.db.Query(`
+		SELECT m.id, m.created_by, m.title, m.note, m.location,
+		       m.created_at, m.updated_at, m.deleted_at
+		FROM memories m
+		JOIN memory_friends mf ON m.id = mf.memory_id
+		WHERE m.created_by = $1
+		  AND mf.friend_id = $2
+		  AND m.deleted_at IS NULL
+		  AND mf.deleted_at IS NULL
+		ORDER BY m.created_at DESC
+	`, userID, friendID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	memories := []Memory{}
+	for rows.Next() {
+		var mem Memory
+		if err := rows.Scan(
+			&mem.ID, &mem.CreatedBy, &mem.Title, &mem.Note,
+			&mem.Location, &mem.CreatedAt, &mem.UpdatedAt, &mem.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		memories = append(memories, mem)
+	}
+	return memories, nil
+}
