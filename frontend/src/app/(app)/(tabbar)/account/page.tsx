@@ -9,6 +9,7 @@ import {
   ChevronRight,
   UsersRound,
   KeyRound,
+  LogOut,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -57,9 +58,7 @@ export default function Page() {
   const buttons = [
     {
       label: "話し相手一覧",
-      leftIcon: (
-        <UsersRound size={20} className="text-[var(--brand-violet-2)]" />
-      ),
+      leftIcon: <UsersRound size={20} className="color-brand-violet-2" />,
       href: "/account/friends",
     },
     {
@@ -73,6 +72,11 @@ export default function Page() {
     {
       label: "アカウント削除",
       leftIcon: <Trash2 size={20} className="color-brand-violet-2" />,
+    },
+    {
+      label: "ログアウト",
+      leftIcon: <LogOut size={20} className="color-brand-violet-2" />,
+      href: "/logout",
     },
   ];
 
@@ -104,7 +108,7 @@ export default function Page() {
                 border: "2px solid var(--brand-violet-3)",
               }}
             >
-              <div className="flex items-center gap-x-2">
+              <div className="flex items-center gap-x-3">
                 <div>{btn.leftIcon}</div>
                 <span>{btn.label}</span>
               </div>
