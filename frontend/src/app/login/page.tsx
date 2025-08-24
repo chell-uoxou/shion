@@ -2,12 +2,12 @@
 
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
+import { API_BASE_URL } from "@/lib/env";
 import Image from "next/image";
 
 export default function Page() {
   const handleGoogleLogin = () => {
-    // 実際のログインURLに差し替え
-    window.location.href = "http://localhost:8080/login";
+    window.location.href = `${API_BASE_URL}/login`;
   };
 
   return (

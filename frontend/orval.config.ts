@@ -2,11 +2,11 @@ import { defineConfig } from "orval";
 
 import * as dotenv from "dotenv";
 dotenv.config();
-const envApiBaseUrl = process.env.API_BASE_URL;
+const envApiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 if (!envApiBaseUrl) {
   console.warn(
-    "API_BASE_URL is not set in .env file. Defaulting to http://localhost:8080"
+    "NEXT_PUBLIC_API_BASE_URL is not set in .env file. Defaulting to http://localhost:8080"
   );
 }
 
