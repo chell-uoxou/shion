@@ -1,7 +1,16 @@
 import Image from "next/image";
 
-export const Logo = () => {
+interface LogoProps {
+  className?: string;
+}
+export const Logo = ({ className }: LogoProps) => {
   return (
-    <Image className="" src="/logo.svg" alt="ロゴ画像" width={80} height={80} />
+    <Image
+      className={className}
+      src="/logo.svg"
+      alt="ロゴ画像"
+      width={80}
+      height={80}
+    />
   );
 };

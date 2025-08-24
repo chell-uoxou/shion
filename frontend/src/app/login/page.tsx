@@ -1,6 +1,8 @@
 "use client";
 
+import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 export default function Page() {
   const handleGoogleLogin = () => {
@@ -9,15 +11,23 @@ export default function Page() {
   };
 
   return (
-    <div className="min-h-dvh flex flex-col items-center justify-center bg-[#F4EEF8] text-[#4E2A6E]">
+    <div className="min-h-dvh flex flex-col items-center justify-center gap-4">
       {/* タイトル */}
-      <h1 className="mb-8 text-2xl font-semibold tracking-widest">紫苑</h1>
+      <Logo className="w-32" />
 
       {/* ログインボタン */}
       <Button
         onClick={handleGoogleLogin}
-        className="bg-[#C9B2E6] hover:bg-[#bda4df] text-[#4E2A6E] rounded-xl px-6 py-5 text-base shadow-md"
+        size={"lg"}
+        className="bg-white hover:bg-white text-brand-violet-2 rounded-xl text-base"
       >
+        <Image
+          src={"./google.svg"}
+          alt="Google Logo"
+          className="inline-block mr-2"
+          width={24}
+          height={24}
+        />
         Googleでログイン
       </Button>
     </div>
