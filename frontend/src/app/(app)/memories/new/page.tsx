@@ -17,6 +17,8 @@ import {
 import { Friend } from "@/generated/api/model";
 import { UserIcon } from "@/features/FriendListitem/page";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { Logo } from "@/components/Logo";
 
 export default function Page() {
   const [title, setTitle] = useState("");
@@ -83,7 +85,11 @@ export default function Page() {
       )}
 
       {/* ヘッダー */}
-      <h1 className="flex justify-center items-center h-16 z-10">shion logo</h1>
+      <h1 className="flex justify-center items-center h-16 z-10">
+        <div className="flex items-center justify-center h-16">
+          <Logo />
+        </div>
+      </h1>
 
       {/* 画像 */}
       <AnimatePresence>
@@ -157,7 +163,9 @@ export default function Page() {
             />
           </motion.div>
         ) : (
-          <p className="w-full p-2 max-h-55 overflow-y-auto">{details}</p>
+          <p className="w-full p-2 max-h-56 overflow-y-auto overflow-x-hidden break-words">
+            {details}
+          </p>
         )}
       </motion.div>
 
@@ -187,7 +195,7 @@ export default function Page() {
           transition={{ duration: 0.5 }}
         >
           {memoryFriends.length == 0 ? (
-            <div className="flex flex-col items-center gap-3">
+            <div className="fixed bottom-70 flex flex-col items-center gap-3">
               <Button
                 onClick={() => setSelectOpen(true)}
                 variant="link"
@@ -195,7 +203,9 @@ export default function Page() {
               >
                 <UserRoundPlus />
               </Button>
-              <p className="text-[var(--brand-violet-3)]">話し相手を追加</p>
+              <p className="fixed bottom-65 text-[var(--brand-violet-3)]">
+                話し相手を追加
+              </p>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-3">
@@ -241,7 +251,7 @@ export default function Page() {
               setDetailOpen(false);
             }}
           />
-          <div className="flex space-x-6 mb-8">
+          <div className="fixed bottom-24 flex space-x-6 mb-8">
             <div className="flex flex-col items-center space-y-2 p-4 border-2 border-dashed rounded-2xl text-[var(--brand-violet-3)]">
               <Button variant="link">
                 <Plus />
