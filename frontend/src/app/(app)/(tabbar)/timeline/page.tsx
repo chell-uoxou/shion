@@ -17,7 +17,6 @@ export default function Page() {
 
   const friendIdFilter = searchParams.get("friend_id");
   console.log(friendIdFilter);
-  const friendName = searchParams.get("friend_name") ?? "";
 
   const handleback = () => {
     router.push("/recent");
