@@ -57,6 +57,7 @@ export default function Page() {
             reason_note: item.reason,
           };
         }),
+        occurred_at: today.toISOString(),
       },
     });
     router.push("/timeline");
