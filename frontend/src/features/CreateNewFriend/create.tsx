@@ -54,7 +54,7 @@ export function CreateFriendDialog({
       <DialogContent className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-w-sm bg-[var(--brand-violet-1)] h-[500px] p-4">
         <DialogHeader>
           <DialogTitle className="text-xl text-[var(--brand-violet-4)] text-center">
-            ＜話し相手を追加＞
+            話し相手リストに新規追加
           </DialogTitle>
         </DialogHeader>
 
