@@ -11,7 +11,7 @@ import {
 import LoadingWithText from "@/components/LoadingWithText";
 import Link from "next/link";
 
-export default function Page() {
+export default function TimelineInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
