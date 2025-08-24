@@ -328,6 +328,32 @@ paths:
           description: Forbidden (not owned by current user)
         "404":
           description: Not found
+  /recent_friends:
+    get:
+      summary: List friends ordered by last selected date with their most recent memory
+      description: |
+        ログイン中のユーザーの friend を `last_selected_at` 順に並べて返す。
+        各要素は friend 情報と、その friend に紐づいた最後の memory を持つ。
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Ordered list of friends with their most recent memory
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    friend:
+                      $ref: "#/components/schemas/Friend"
+                    recent_memory:
+                      nullable: true
+                      allOf:
+                        - $ref: "#/components/schemas/Memory"
+        "401":
+          description: Unauthorized
 
 components:
   securitySchemes:

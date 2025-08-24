@@ -2,6 +2,7 @@ package resource
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"shion/middleware"
 	"shion/repository/postgres"
@@ -12,10 +13,11 @@ import (
 type MemoryRouter struct {
 	memoryRepo *postgres.MemoryRepository
 	userRepo   *postgres.UserRepository
+	friendRepo *postgres.FriendRepository
 }
 
-func NewMemoryRouter(repoMemory *postgres.MemoryRepository, repoUser *postgres.UserRepository) *MemoryRouter {
-	return &MemoryRouter{memoryRepo: repoMemory, userRepo: repoUser}
+func NewMemoryRouter(repoMemory *postgres.MemoryRepository, repoUser *postgres.UserRepository, repoFriend *postgres.FriendRepository) *MemoryRouter {
+	return &MemoryRouter{memoryRepo: repoMemory, userRepo: repoUser, friendRepo: repoFriend}
 }
 
 func (r *MemoryRouter) Register(mux *http.ServeMux) {
@@ -103,6 +105,17 @@ func (r *MemoryRouter) Create(w http.ResponseWriter, req *http.Request) {
 		body.OccurredAt,
 		body.Friends,
 	)
+
+	// 全フレンドの最終選択時を更新
+	for _, f := range body.Friends {
+
+		fmt.Println("Updating last selected for friend:", f.FriendID)
+		if err := r.friendRepo.UpdateLastSelected(f.FriendID); err != nil {
+			http.Error(w, "failed to update friend last selected", http.StatusInternalServerError)
+			return
+		}
+	}
+
 	if err != nil {
 		http.Error(w, "failed to create memory", http.StatusInternalServerError)
 		return

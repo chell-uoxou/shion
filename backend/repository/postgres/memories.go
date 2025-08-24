@@ -197,3 +197,25 @@ func (r *MemoryRepository) Delete(id int) error {
 	`, id)
 	return err
 }
+
+// GetLatestByFriend 特定の friend に関連する最新の memory を取得
+func (r *MemoryRepository) GetLatestByFriend(friendID int) (*Memory, error) {
+	row := r.db.QueryRow(`
+		SELECT m.id, m.created_by, m.title, m.note, m.location, m.occurred_at,
+		       m.created_at, m.updated_at, m.deleted_at
+		FROM memories m
+		JOIN memory_friends mf ON m.id = mf.memory_id
+		WHERE mf.friend_id = $1 AND m.deleted_at IS NULL
+		ORDER BY m.created_at DESC
+		LIMIT 1
+	`, friendID)
+
+	var mem Memory
+	if err := row.Scan(
+		&mem.ID, &mem.CreatedBy, &mem.Title, &mem.Note, &mem.Location,
+		&mem.OccurredAt, &mem.CreatedAt, &mem.UpdatedAt, &mem.DeletedAt,
+	); err != nil {
+		return nil, err
+	}
+	return &mem, nil
+}
