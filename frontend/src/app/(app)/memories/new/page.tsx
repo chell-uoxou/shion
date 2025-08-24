@@ -17,6 +17,8 @@ import {
 import { Friend } from "@/generated/api/model";
 import { UserIcon } from "@/features/FriendListitem/page";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { Logo } from "@/components/Logo";
 
 export default function Page() {
   const [title, setTitle] = useState("");
@@ -63,15 +65,37 @@ export default function Page() {
   };
 
   return (
-    <div className="bg-white w-full min-h-screen relative flex flex-col items-center">
+    <motion.div
+      className="w-full min-h-screen relative flex flex-col items-center"
+      animate={{
+        backgroundColor: doneTextarea ? "var(--brand-violet-2)" : "white",
+      }}
+      transition={{ duration: 0.5 }}
+    >
+      {/* SVG 背景：入力後に表示 */}
+      {doneTextarea && (
+        <motion.img
+          src="/vector.svg"
+          alt="Background Vector"
+          className="pointer-events-none fixed inset-0 w-[5000px] h-[5000px] opacity-40 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 scale-200"
+          animate={{ rotate: 360 }}
+          transition={{ repeat: Infinity, duration: 30, ease: "linear" }}
+          style={{ transform: "translate(-50%, -50%)" }}
+        />
+      )}
+
       {/* ヘッダー */}
-      <h1 className="flex justify-center items-center h-16">shion logo</h1>
+      <h1 className="flex justify-center items-center h-16 z-10">
+        <div className="flex items-center justify-center h-16">
+          <Logo />
+        </div>
+      </h1>
 
       {/* 画像 */}
       <AnimatePresence>
         {!doneInput && (
           <motion.div
-            className="relative w-55 mx-auto mt-5"
+            className="relative w-55 mx-auto mt-5 z-10"
             initial={{ opacity: 1 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.5 }}
@@ -90,7 +114,7 @@ export default function Page() {
 
       {/* 日付 */}
       <motion.div
-        className="w-[90%] max-w-md mt-3 mx-auto pl-0"
+        className="w-[90%] max-w-md mt-3 mx-auto pl-0 z-10"
         animate={{ y: doneInput ? -20 : 0 }}
         transition={{ type: "spring", stiffness: 120 }}
       >
@@ -104,7 +128,7 @@ export default function Page() {
 
       {/* 入力エリア */}
       <motion.div
-        className="flex flex-col justify-center w-[90%] max-w-md mt-2"
+        className="flex flex-col justify-center w-[90%] max-w-md mt-2 z-10"
         animate={{ y: doneInput ? -20 : 0 }}
         transition={{ type: "spring", stiffness: 120 }}
       >
@@ -134,11 +158,14 @@ export default function Page() {
               placeholder="できごとや発見の詳細"
               onChange={(e) => setDetails(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleTextareaComplete()}
+              onBlur={handleTextareaComplete}
               className="w-full h-full border-none shadow-none focus-visible:ring-0 focus-visible:border-none focus-visible:shadow-none placeholder:text-gray-400 max-h-45 overflow-y-auto"
             />
           </motion.div>
         ) : (
-          <p className="w-full p-2 max-h-55 overflow-y-auto">{details}</p>
+          <p className="w-full p-2 max-h-56 overflow-y-auto overflow-x-hidden break-words">
+            {details}
+          </p>
         )}
       </motion.div>
 
@@ -146,7 +173,7 @@ export default function Page() {
       {!doneTextarea && (
         <div
           className="fixed bottom-70 left-1/2 transform -translate-x-1/2 flex flex-col items-center 
-                    bg-[var(--brand-violet-1)] rounded-2xl p-4 w-[90%] max-w-md"
+                        bg-[var(--brand-violet-1)] rounded-2xl p-4 w-[90%] max-w-md z-10"
         >
           <p className="text-[var(--brand-violet-2)] font-serif">
             {doneInput ? "2/2" : "1/2"}
@@ -159,16 +186,16 @@ export default function Page() {
         </div>
       )}
 
-      {/* Textarea 完了後に表示する要素 */}
+      {/* Textarea 完了後の要素 */}
       {doneTextarea && (
         <motion.div
-          className="flex flex-col items-center mb-10 space-y-4"
+          className="flex flex-col items-center mb-2 space-y-4 z-10"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
           {memoryFriends.length == 0 ? (
-            <div className="flex flex-col items-center gap-3">
+            <div className="fixed bottom-70 flex flex-col items-center gap-3">
               <Button
                 onClick={() => setSelectOpen(true)}
                 variant="link"
@@ -176,7 +203,9 @@ export default function Page() {
               >
                 <UserRoundPlus />
               </Button>
-              <p className="text-[var(--brand-violet-3)]">話し相手を追加</p>
+              <p className="fixed bottom-65 text-[var(--brand-violet-3)]">
+                話し相手を追加
+              </p>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-3">
@@ -222,7 +251,7 @@ export default function Page() {
               setDetailOpen(false);
             }}
           />
-          <div className="flex space-x-6 mb-8">
+          <div className="fixed bottom-24 flex space-x-6 mb-8">
             <div className="flex flex-col items-center space-y-2 p-4 border-2 border-dashed rounded-2xl text-[var(--brand-violet-3)]">
               <Button variant="link">
                 <Plus />
@@ -238,7 +267,7 @@ export default function Page() {
           </div>
 
           <Button
-            className="w-24 mb-8 bg-[var(--brand-violet-3)] text-white rounded-2xl"
+            className="fixed bottom-12 left-1/2 transform -translate-x-1/2 w-24 bg-[var(--brand-violet-3)] text-white rounded-2xl z-20"
             variant="default"
             onClick={handleClickSubmit}
           >
@@ -246,6 +275,6 @@ export default function Page() {
           </Button>
         </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 }
