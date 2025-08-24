@@ -127,3 +127,30 @@ func (r *FriendRepository) Delete(id int) error {
 	`, id)
 	return err
 }
+
+// ListOrderedByLastSelected ユーザーが作成した全ての friends を最終選択日時順に返す（論理削除は除外）
+func (r *FriendRepository) ListOrderedByLastSelected(userID int) ([]Friend, error) {
+	rows, err := r.db.Query(`
+		SELECT id, created_by, display_name, note, avatar_color, avatar_icon, last_selected_at, created_at, updated_at, deleted_at
+		FROM friends
+		WHERE created_by = $1 AND deleted_at IS NULL
+		ORDER BY last_selected_at DESC NULLS LAST, created_at DESC
+	`, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	friends := []Friend{}
+	for rows.Next() {
+		var f Friend
+		if err := rows.Scan(
+			&f.ID, &f.CreatedBy, &f.DisplayName, &f.Note, &f.AvatarColor, &f.AvatarIcon,
+			&f.LastSelected, &f.CreatedAt, &f.UpdatedAt, &f.DeletedAt,
+		); err != nil {
+			return nil, err
+		}
+		friends = append(friends, f)
+	}
+	return friends, nil
+}
