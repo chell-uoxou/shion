@@ -33,9 +33,11 @@ export default function Page() {
           </h1>
         </div>
       ) : (
-        <SearchForm />
+        <div className="mb-12">
+          <SearchForm />
+        </div>
       )}
-      <div className="flex-1 w-full px-6 pt-12 overflow-y-auto">
+      <div className="flex-1 w-full px-6 overflow-y-auto">
         <div className="flex flex-col items-center gap-6">
           {isLoading ? (
             <LoadingWithText />
