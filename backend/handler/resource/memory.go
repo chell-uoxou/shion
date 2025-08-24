@@ -65,10 +65,26 @@ func (r *MemoryRouter) List(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	memories, err := r.memoryRepo.List(user.ID)
-	if err != nil {
-		http.Error(w, "failed to fetch memories", http.StatusInternalServerError)
-		return
+	friendIDStr := req.URL.Query().Get("friend_id")
+
+	var memories []postgres.Memory
+	if friendIDStr != "" {
+		friendID, err := strconv.Atoi(friendIDStr)
+		if err != nil {
+			http.Error(w, "invalid friend_id", http.StatusBadRequest)
+			return
+		}
+		memories, err = r.memoryRepo.ListByFriend(user.ID, friendID)
+		if err != nil {
+			http.Error(w, "failed to fetch memories by friend", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		memories, err = r.memoryRepo.List(user.ID)
+		if err != nil {
+			http.Error(w, "failed to fetch memories", http.StatusInternalServerError)
+			return
+		}
 	}
 
 	w.Header().Set("Content-Type", "application/json")
