@@ -4,10 +4,10 @@ import Link from "next/link";
 import React from "react";
 
 type RecentFriendProps = {
-  id: string;
+  id: string | undefined;
   name: string;
   event: string;
-  date: string;
+  date: Date | undefined;
 };
 export function RecentFriend(props: RecentFriendProps) {
   return (
@@ -20,7 +20,9 @@ export function RecentFriend(props: RecentFriendProps) {
         <span className="text-sm text-purple-600">{props.name}</span>
         <span className="text-xs text-gray-500 opacity-75">{props.event}</span>
       </div>
-      <span className="text-xs text-gray-500 ml-auto">{props.date}</span>
+      <span className="text-xs text-gray-500 ml-auto">
+        {props.date?.toLocaleDateString()}
+      </span>
     </Link>
   );
 }
