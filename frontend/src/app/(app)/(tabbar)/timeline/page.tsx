@@ -22,7 +22,7 @@ export default function Page() {
     router.push("/recent");
   };
   return (
-    <>
+    <div className="h-[calc(100vh-120px)] flex flex-col w-full">
       {friendIdFilter ? (
         <div className="relative flex items-center justify-center py-2">
           <div className="absolute left-1" onClick={handleback}>
@@ -35,7 +35,7 @@ export default function Page() {
       ) : (
         <SearchForm />
       )}
-      <div className="w-full px-6 pt-12">
+      <div className="flex-1 w-full px-6 pt-12 overflow-y-auto">
         <div className="flex flex-col items-center gap-6">
           {isLoading ? (
             <LoadingWithText />
@@ -60,6 +60,6 @@ export default function Page() {
       <Link href="/memories/new">
         <CirclePlus className="fill-[var(--brand-violet-3)] text-[var(--brand-violet-1)] w-16 h-16 fixed bottom-18 right-5" />
       </Link>
-    </>
+    </div>
   );
 }
