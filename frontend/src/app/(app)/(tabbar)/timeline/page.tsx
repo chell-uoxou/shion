@@ -9,13 +9,15 @@ import LoadingWithText from "@/components/LoadingWithText";
 import Link from "next/link";
 
 export default function Page() {
-  const { data, isLoading } = useGetMemories();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const hasMemory = isLoading ? false : data?.data.length !== 0;
-  const memories = data?.data ?? [];
 
   const friendIdFilter = searchParams.get("friend_id");
+  const { data, isLoading } = useGetMemories(
+    friendIdFilter ? { friend_id: Number(friendIdFilter) } : undefined
+  );
+  const hasMemory = isLoading ? false : data?.data.length !== 0;
+  const memories = data?.data ?? [];
   console.log(friendIdFilter);
 
   const handleback = () => {
